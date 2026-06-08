@@ -10,6 +10,10 @@ class Settings(BaseSettings):
     )
     APP_ENV: str = Field(default="development")
     FRONTEND_ORIGIN: str = Field(default="http://localhost:3000")
+    CORS_ORIGINS: str = Field(
+        default="",
+        description="Comma-separated list of allowed CORS origins. If empty, defaults to FRONTEND_ORIGIN + localhost."
+    )
     JWT_SECRET: str = Field(default="supersecret_replace_this_in_production_92138402138")
     JWT_ALGORITHM: str = Field(default="HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=720)  # 12 hours
@@ -24,6 +28,21 @@ class Settings(BaseSettings):
     # Stripe Settings
     STRIPE_SECRET_KEY: str = Field(default="")
     STRIPE_WEBHOOK_SECRET: str = Field(default="")
+
+    @property
+    def cors_origins_list(self) -> List[str]:
+        """Parse CORS_ORIGINS into a deduplicated list. Falls back to FRONTEND_ORIGIN + localhost."""
+        origins = set()
+        if self.CORS_ORIGINS:
+            for origin in self.CORS_ORIGINS.split(","):
+                origin = origin.strip()
+                if origin:
+                    origins.add(origin)
+        # Always include FRONTEND_ORIGIN and common local dev origins
+        origins.add(self.FRONTEND_ORIGIN)
+        origins.add("http://localhost:3000")
+        origins.add("http://127.0.0.1:3000")
+        return list(origins)
 
     @property
     def async_database_url(self) -> str:
