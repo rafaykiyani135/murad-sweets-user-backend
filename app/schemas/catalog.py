@@ -1,7 +1,7 @@
 import uuid
 from datetime import datetime
 from typing import List, Optional, Dict, Any
-from pydantic import BaseModel, ConfigDict
+from pydantic import BaseModel, ConfigDict, Field
 
 class CategoryBase(BaseModel):
     slug: str
@@ -30,7 +30,7 @@ class ProductOptionOut(BaseModel):
     price_cents: int
     selection_count: int
     is_active: bool
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: Optional[Dict[str, Any]] = Field(default=None, validation_alias="metadata_json")
     custom_box_rules: List[CustomBoxRuleOut] = []
     model_config = ConfigDict(from_attributes=True)
 
@@ -50,7 +50,7 @@ class ProductOut(BaseModel):
     is_in_stock: bool
     preorder_only: bool
     prep_time_hours: int
-    metadata: Optional[Dict[str, Any]] = None
+    metadata: Optional[Dict[str, Any]] = Field(default=None, validation_alias="metadata_json")
     options: List[ProductOptionOut] = []
     model_config = ConfigDict(from_attributes=True)
 

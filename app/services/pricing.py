@@ -14,7 +14,13 @@ DELIVERY_FEE_CENTS = 500       # $5.00 flat delivery fee
 
 def get_deterministic_uuid(frontend_id: str) -> uuid.UUID:
     """Generate a deterministic UUID from the frontend ID."""
-    # For assorted boxes, strip timestamp (e.g., assorted-3-1718... -> assorted-3)
+    try:
+        # If the frontend sent an actual backend UUID (which it does now), use it directly
+        return uuid.UUID(frontend_id)
+    except ValueError:
+        pass
+        
+    # Fallback for old string slugs (e.g., assorted boxes)
     if frontend_id.startswith("assorted-"):
         parts = frontend_id.split("-")
         if len(parts) >= 2:

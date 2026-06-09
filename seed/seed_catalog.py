@@ -314,39 +314,6 @@ PRODUCTS_DATA = [
         "product_type": "custom_box",
         "in_stock": True,
         "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
-    },
-    {
-        "orig_id": "assorted-3",
-        "slug": "assorted-3",
-        "name": "Assorted Custom 3-Pack Box",
-        "category_slug": "dry-sweets",
-        "description": "Hand-picked assorted box containing 3 dry sweets.",
-        "price_cents": 500,
-        "product_type": "custom_box",
-        "in_stock": True,
-        "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
-    },
-    {
-        "orig_id": "assorted-6",
-        "slug": "assorted-6",
-        "name": "Assorted Custom 6-Pack Box",
-        "category_slug": "dry-sweets",
-        "description": "Hand-picked assorted box containing 6 dry sweets.",
-        "price_cents": 1000,
-        "product_type": "custom_box",
-        "in_stock": True,
-        "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
-    },
-    {
-        "orig_id": "assorted-9",
-        "slug": "assorted-9",
-        "name": "Assorted Custom 9-Pack Box",
-        "category_slug": "dry-sweets",
-        "description": "Hand-picked assorted box containing 9 dry sweets.",
-        "price_cents": 1500,
-        "product_type": "custom_box",
-        "in_stock": True,
-        "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
     }
 ]
 
