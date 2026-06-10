@@ -13,6 +13,7 @@ from app.services.scheduling import validate_schedule
 from app.services.order_numbers import generate_order_number
 from app.services.payments import create_payment_intent
 from app.services.notifications import send_order_confirmation_emails
+from app.services.inventory import deduct_inventory
 
 router = APIRouter()
 
@@ -162,6 +163,9 @@ async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db))
             selections=item["selections"]
         )
         db.add(order_item)
+    
+    # 8. Deduct inventory — runs inside the same transaction as the order
+    await deduct_inventory(db, quote["validated_items"])
         
     await db.commit()
     

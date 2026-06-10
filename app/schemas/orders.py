@@ -86,3 +86,16 @@ class OrderStatusUpdate(BaseModel):
 # Admin Notes updates
 class OrderNotesUpdate(BaseModel):
     admin_notes: str
+
+# Lightweight summary for history/dashboard listing
+class OrderSummary(BaseModel):
+    order_number: str
+    status: str
+    customer_name: str
+    total: float
+    scheduled_date: str
+    item_count: int
+    fulfillment_type: str
+    created_at: datetime
+
+    model_config = ConfigDict(from_attributes=True)

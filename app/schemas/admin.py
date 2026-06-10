@@ -63,3 +63,7 @@ class SettingsUpdate(BaseModel):
     delivery_minimum_cents: Optional[int] = None
     time_slots: Optional[List[str]] = None
     payment_methods: Optional[List[str]] = None
+
+
+class RestockUpdate(BaseModel):
+    quantity: int  # Units to add to current quantity_on_hand

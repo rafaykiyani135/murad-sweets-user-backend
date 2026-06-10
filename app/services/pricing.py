@@ -73,6 +73,13 @@ async def calculate_quote(
         if not product.is_in_stock:
             raise HTTPException(status_code=400, detail=f"Product {product.name} is currently out of stock.")
 
+        # Hard-block if tracked quantity is insufficient
+        if product.quantity_on_hand is not None and product.quantity_on_hand < quantity:
+            raise HTTPException(
+                status_code=400,
+                detail=f"Only {product.quantity_on_hand} unit(s) of '{product.name}' left in stock."
+            )
+
         # Check prep time
         if product.preorder_only and product.prep_time_hours > max_prep_time_hours:
             max_prep_time_hours = product.prep_time_hours
@@ -148,6 +155,12 @@ async def calculate_quote(
                         raise HTTPException(
                             status_code=400,
                             detail=f"Invalid sweet selection: {selected.get('name', sweet_id)}. Only active, in-stock dry sweets are allowed."
+                        )
+                    # Hard-block if tracked quantity is insufficient for this sweet
+                    if sweet.quantity_on_hand is not None and sweet.quantity_on_hand < sweet_qty:
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"Only {sweet.quantity_on_hand} unit(s) of '{sweet.name}' left in stock."
                         )
             
             elif assorted_box:

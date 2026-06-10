@@ -1,6 +1,6 @@
 import uuid
 from datetime import datetime, timezone
-from sqlalchemy import String, Integer, Boolean, DateTime, ForeignKey, JSON
+from sqlalchemy import String, Integer, Boolean, DateTime, ForeignKey, JSON, Numeric
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from app.db.base import Base
 
@@ -20,6 +20,7 @@ class Product(Base):
     max_quantity: Mapped[int | None] = mapped_column(Integer, nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_in_stock: Mapped[bool] = mapped_column(Boolean, default=True)
+    quantity_on_hand: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)  # NULL = untracked, 0 = out of stock
     preorder_only: Mapped[bool] = mapped_column(Boolean, default=False)
     prep_time_hours: Mapped[int] = mapped_column(Integer, default=0)
     metadata_json: Mapped[dict | None] = mapped_column(JSON, name="metadata", nullable=True)

@@ -48,6 +48,7 @@ class ProductOut(BaseModel):
     max_quantity: Optional[int] = None
     is_active: bool
     is_in_stock: bool
+    quantity_on_hand: Optional[int] = None
     preorder_only: bool
     prep_time_hours: int
     metadata: Optional[Dict[str, Any]] = Field(default=None, validation_alias="metadata_json")

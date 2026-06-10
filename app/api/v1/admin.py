@@ -14,13 +14,14 @@ from app.models.order import Order
 from app.models.inquiry import Inquiry
 from app.models.product import Product
 from app.models.category import Category
-from app.schemas.admin import AdminLogin, Token, ProductAvailabilityUpdate, ProductUpdate, ProductCreate
+from app.schemas.admin import AdminLogin, Token, ProductAvailabilityUpdate, ProductUpdate, ProductCreate, RestockUpdate
 from app.schemas.orders import OrderOut, OrderStatusUpdate, OrderNotesUpdate
 from app.schemas.inquiries import InquiryOut, InquiryStatusUpdate
 from app.schemas.catalog import ProductOut
 from app.core import security
 from app.core.config import settings
 from app.api.v1.orders import serialize_order
+from app.services.inventory import restore_inventory
 
 router = APIRouter()
 security_bearer = HTTPBearer()
@@ -116,8 +117,14 @@ async def update_order_status(
     order = result.scalar_one_or_none()
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
-        
+
+    previous_status = order.status
     order.status = payload.status
+
+    # Restore inventory if order is being cancelled for the first time
+    if payload.status == "cancelled" and previous_status != "cancelled":
+        await restore_inventory(db, order)
+
     await db.commit()
     return serialize_order(order)
 
@@ -254,4 +261,39 @@ async def update_product(
             setattr(product, field, val)
             
     await db.commit()
+    return product
+
+
+@router.patch("/products/{id}/restock", response_model=ProductOut)
+async def restock_product(
+    id: uuid.UUID,
+    payload: RestockUpdate,
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin)
+):
+    """Add stock quantity to a product. Initializes tracking if previously untracked (NULL)."""
+    result = await db.execute(
+        select(Product)
+        .options(selectinload(Product.options))
+        .where(Product.id == id)
+    )
+    product = result.scalar_one_or_none()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    if payload.quantity <= 0:
+        raise HTTPException(status_code=400, detail="Restock quantity must be greater than 0.")
+
+    # Initialize tracking if this product was previously untracked (NULL)
+    if product.quantity_on_hand is None:
+        product.quantity_on_hand = payload.quantity
+    else:
+        product.quantity_on_hand += payload.quantity
+
+    # Auto-set in_stock when quantity goes above 0
+    if product.quantity_on_hand > 0:
+        product.is_in_stock = True
+
+    await db.commit()
+    await db.refresh(product)
     return product

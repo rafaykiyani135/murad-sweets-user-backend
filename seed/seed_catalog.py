@@ -50,6 +50,7 @@ PRODUCTS_DATA = [
         "price_cents": 0,
         "product_type": "selection_item",
         "in_stock": True,
+        "quantity_on_hand": 50,
         "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
     },
     {
@@ -61,6 +62,7 @@ PRODUCTS_DATA = [
         "price_cents": 0,
         "product_type": "selection_item",
         "in_stock": True,
+        "quantity_on_hand": 50,
         "images": ["https://images.unsplash.com/photo-1548680373-ab6d4a5b48d7?w=600&auto=format&fit=crop&q=80"]
     },
     {
@@ -72,6 +74,7 @@ PRODUCTS_DATA = [
         "price_cents": 0,
         "product_type": "selection_item",
         "in_stock": True,
+        "quantity_on_hand": 50,
         "images": ["https://images.unsplash.com/photo-1589135306090-e5550a6f0a0d?w=600&auto=format&fit=crop&q=80"]
     },
     {
@@ -83,6 +86,7 @@ PRODUCTS_DATA = [
         "price_cents": 0,
         "product_type": "selection_item",
         "in_stock": True,
+        "quantity_on_hand": 50,
         "images": ["https://images.unsplash.com/photo-1605697040924-852290747ef4?w=600&auto=format&fit=crop&q=80"]
     },
     {
@@ -94,6 +98,7 @@ PRODUCTS_DATA = [
         "price_cents": 0,
         "product_type": "selection_item",
         "in_stock": True,
+        "quantity_on_hand": 50,
         "images": ["https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=600&auto=format&fit=crop&q=80"]
     },
     {
@@ -105,6 +110,7 @@ PRODUCTS_DATA = [
         "price_cents": 0,
         "product_type": "selection_item",
         "in_stock": True,
+        "quantity_on_hand": 50,
         "images": ["https://images.unsplash.com/photo-1589135306090-e5550a6f0a0d?w=600&auto=format&fit=crop&q=80"]
     },
     {
@@ -116,6 +122,7 @@ PRODUCTS_DATA = [
         "price_cents": 0,
         "product_type": "selection_item",
         "in_stock": True,
+        "quantity_on_hand": 50,
         "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
     },
     {
@@ -127,6 +134,7 @@ PRODUCTS_DATA = [
         "price_cents": 0,
         "product_type": "selection_item",
         "in_stock": True,
+        "quantity_on_hand": 50,
         "images": ["https://images.unsplash.com/photo-1548680373-ab6d4a5b48d7?w=600&auto=format&fit=crop&q=80"]
     },
     {
@@ -138,6 +146,7 @@ PRODUCTS_DATA = [
         "price_cents": 0,
         "product_type": "selection_item",
         "in_stock": True,
+        "quantity_on_hand": 50,
         "images": ["/laddu.png"]
     },
     {
@@ -149,6 +158,7 @@ PRODUCTS_DATA = [
         "price_cents": 0,
         "product_type": "selection_item",
         "in_stock": True,
+        "quantity_on_hand": 50,
         "images": ["https://images.unsplash.com/photo-1589135306090-e5550a6f0a0d?w=600&auto=format&fit=crop&q=80"]
     },
     {
@@ -160,6 +170,7 @@ PRODUCTS_DATA = [
         "price_cents": 0,
         "product_type": "selection_item",
         "in_stock": True,
+        "quantity_on_hand": 50,
         "images": ["/gulab-jamun.png"]
     },
     {
@@ -171,6 +182,7 @@ PRODUCTS_DATA = [
         "price_cents": 0,
         "product_type": "selection_item",
         "in_stock": False,  # Sold out in frontend
+        "quantity_on_hand": 0,
         "images": ["https://images.unsplash.com/photo-1589135306090-e5550a6f0a0d?w=600&auto=format&fit=crop&q=80"]
     },
     # Specialty
@@ -184,6 +196,7 @@ PRODUCTS_DATA = [
         "unit_label": "per cake (8oz)",
         "product_type": "standard",
         "in_stock": True,
+        "quantity_on_hand": 20,
         "images": ["/rasmalai.png"]
     },
     {
@@ -196,6 +209,7 @@ PRODUCTS_DATA = [
         "unit_label": "per box (4pc)",
         "product_type": "standard",
         "in_stock": True,
+        "quantity_on_hand": 20,
         "images": ["/gulab-jamun.png"]
     },
     {
@@ -208,6 +222,7 @@ PRODUCTS_DATA = [
         "unit_label": "per box (16oz)",
         "product_type": "standard",
         "in_stock": True,
+        "quantity_on_hand": 20,
         "images": ["/mishti-doi.png"]
     },
     # Party Trays
@@ -376,11 +391,16 @@ async def seed_database():
                     max_quantity=prod_data.get("max_quantity"),
                     is_active=True,
                     is_in_stock=prod_data["in_stock"],
+                    quantity_on_hand=prod_data.get("quantity_on_hand"),  # None = untracked
                     preorder_only=prod_data.get("preorder_only", False),
                     prep_time_hours=prod_data.get("prep_time_hours", 0),
                     metadata_json={"images": prod_data["images"]}
                 )
                 session.add(product)
+            else:
+                # Update quantity_on_hand on re-seed only if explicitly set in data
+                if "quantity_on_hand" in prod_data and product.quantity_on_hand is None:
+                    product.quantity_on_hand = prod_data["quantity_on_hand"]
                 
         # Seed default Admin User
         admin_username = "admin"
