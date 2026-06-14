@@ -1,4 +1,7 @@
 import asyncio
+import sys
+if sys.platform == 'win32':
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
 import uuid
 from sqlalchemy.ext.asyncio import create_async_engine, AsyncSession
 from sqlalchemy.orm import sessionmaker
@@ -36,6 +39,12 @@ CATEGORIES_DATA = [
         "name": "Traditional Pitha (Pre-Order Only)",
         "description": "Steamed and fried rice crepes made the authentic way",
         "sort_order": 4
+    },
+    {
+        "slug": "mishti-per-pound",
+        "name": "Mishti Per Pound",
+        "description": "Premium traditional sweets sold by the pound",
+        "sort_order": 5
     }
 ]
 
@@ -51,7 +60,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/KaloJam.webp"]
     },
     {
         "orig_id": "2",
@@ -63,7 +72,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["https://images.unsplash.com/photo-1548680373-ab6d4a5b48d7?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/BrownChomChom.webp"]
     },
     {
         "orig_id": "3",
@@ -75,7 +84,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["https://images.unsplash.com/photo-1589135306090-e5550a6f0a0d?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/WhiteChomChom.webp"]
     },
     {
         "orig_id": "4",
@@ -87,7 +96,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["https://images.unsplash.com/photo-1605697040924-852290747ef4?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/KalujamSandwich.webp"]
     },
     {
         "orig_id": "5",
@@ -99,7 +108,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["https://images.unsplash.com/photo-1505253716362-afaea1d3d1af?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/KheerMouchak.webp"]
     },
     {
         "orig_id": "6",
@@ -111,7 +120,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["https://images.unsplash.com/photo-1589135306090-e5550a6f0a0d?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/MalaiKari.webp"]
     },
     {
         "orig_id": "7",
@@ -123,7 +132,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/RajBhog.webp"]
     },
     {
         "orig_id": "8",
@@ -135,7 +144,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["https://images.unsplash.com/photo-1548680373-ab6d4a5b48d7?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/KatariBhog.webp"]
     },
     {
         "orig_id": "9",
@@ -147,7 +156,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["/laddu.png"]
+        "images": ["/Laddu.webp"]
     },
     {
         "orig_id": "10",
@@ -159,7 +168,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["https://images.unsplash.com/photo-1589135306090-e5550a6f0a0d?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/Shandesh.webp"]
     },
     {
         "orig_id": "11",
@@ -183,47 +192,68 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": False,  # Sold out in frontend
         "quantity_on_hand": 0,
-        "images": ["https://images.unsplash.com/photo-1589135306090-e5550a6f0a0d?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/Peda.webp"]
     },
     # Specialty
     {
-        "orig_id": "13",
-        "slug": "rasmalai-cake",
-        "name": "Rasmalai Cake",
+        "orig_id": "spec-1",
+        "slug": "malai-jarda-half-tray",
+        "name": "Malai Jarda - Half Tray",
         "category_slug": "specialty",
-        "description": "An innovative fusion dessert merging vanilla sponge cake soaked in saffron cardamom milk (ras) and topped with actual Rasmalai pieces and pistachios.",
-        "price_cents": 700,
-        "unit_label": "per cake (8oz)",
+        "description": "Sweet rice dessert mixed with saffron, nuts, and mini gulab jamuns.",
+        "price_cents": 4500,
+        "unit_label": "Half Tray",
         "product_type": "standard",
         "in_stock": True,
-        "quantity_on_hand": 20,
-        "images": ["/rasmalai.png"]
+        "images": ["/MalaiJardaTray.webp"]
     },
     {
-        "orig_id": "14",
-        "slug": "gulab-jamun",
-        "name": "Gulab Jamun",
+        "orig_id": "spec-2",
+        "slug": "roshmalai-half-tray",
+        "name": "RoshMalai - Half Tray",
         "category_slug": "specialty",
-        "description": "Soft, golden-brown dumplings made of milk solids, deep-fried and soaked in a warm, fragrant sugar syrup with rosewater and cardamom.",
-        "price_cents": 600,
-        "unit_label": "per box (4pc)",
+        "description": "Soft chenna dumplings soaked in sweetened, thickened milk.",
+        "price_cents": 5000,
+        "unit_label": "Half Tray",
         "product_type": "standard",
         "in_stock": True,
-        "quantity_on_hand": 20,
-        "images": ["/gulab-jamun.png"]
+        "images": ["/RoshMalaiTray.webp"]
     },
     {
-        "orig_id": "15",
-        "slug": "mishti-doi",
-        "name": "Mishti Doi",
+        "orig_id": "spec-3",
+        "slug": "mishti-doi-16oz",
+        "name": "Mishti Doi - 16 oz",
         "category_slug": "specialty",
-        "description": "Classic Bengali fermented sweet yogurt, prepared in traditional clay pots by boiling milk until thickened, sweetening with brown sugar/jaggery, and fermenting overnight.",
+        "description": "Classic Bengali fermented sweet yogurt.",
         "price_cents": 1000,
-        "unit_label": "per box (16oz)",
+        "unit_label": "16 oz",
         "product_type": "standard",
         "in_stock": True,
-        "quantity_on_hand": 20,
-        "images": ["/mishti-doi.png"]
+        "images": ["/MishtiDoi.webp"]
+    },
+    {
+        "orig_id": "spec-4",
+        "slug": "roshmalai-cake",
+        "name": "RoshMalai Cake",
+        "category_slug": "specialty",
+        "description": "Vanilla sponge cake soaked in saffron milk and topped with Rasmalai pieces.",
+        "price_cents": 700,
+        "unit_label": "per piece",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/RasMalai.webp"]
+    },
+    {
+        "orig_id": "spec-5",
+        "slug": "payesh-kheer",
+        "name": "Payesh Kheer",
+        "category_slug": "specialty",
+        "description": "Rich rice pudding made with slow-cooked milk, jaggery, and nuts.",
+        "price_cents": 600,
+        "unit_label": "per container",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/PayeshKheer.webp"]
     },
     # Party Trays
     {
@@ -236,7 +266,7 @@ PRODUCTS_DATA = [
         "unit_label": "per tray (~18 pcs)",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/SmallPartyTray.webp"]
     },
     {
         "orig_id": "17",
@@ -248,53 +278,210 @@ PRODUCTS_DATA = [
         "unit_label": "per tray (~40 pcs)",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/LargePartyTray.webp"]
     },
     # Pitha
     {
-        "orig_id": "18",
-        "slug": "jhal-pitha",
-        "name": "Jhal Pitha",
+        "orig_id": "pitha-1",
+        "slug": "nokshi-pitha-10pc",
+        "name": "Nokshi Pitha (10 pieces)",
         "category_slug": "pitha",
-        "description": "Savory, spicy steamed rice cakes flavored with green chilies, coriander, onion, and a hint of traditional spices. Perfect for winter evenings.",
-        "price_cents": 400,
-        "unit_label": "per pc",
+        "description": "Beautifully carved, deep-fried rice flour pitha soaked in thick jaggery syrup.",
+        "price_cents": 3000,
+        "unit_label": "10 pieces",
         "product_type": "standard",
         "in_stock": True,
         "preorder_only": True,
-        "min_quantity": 10,
+        "min_quantity": 1,
         "prep_time_hours": 24,
-        "images": ["https://images.unsplash.com/photo-1519676867240-f03562e64548?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/NokshiPitha.webp"]
     },
     {
-        "orig_id": "19",
-        "slug": "puli-pitha",
-        "name": "Puli Pitha",
+        "orig_id": "pitha-2",
+        "slug": "patishapta-pitha-10pc",
+        "name": "Patishapta Pitha (10 pieces)",
         "category_slug": "pitha",
-        "description": "Sweet, half-moon shaped dumplings stuffed with coconut and liquid date molasses (khejur gur), steamed to perfection.",
-        "price_cents": 300,
-        "unit_label": "per pc",
+        "description": "Delicate crepes filled with a rich coconut and milk kheer mixture.",
+        "price_cents": 3000,
+        "unit_label": "10 pieces",
         "product_type": "standard",
         "in_stock": True,
         "preorder_only": True,
-        "min_quantity": 10,
+        "min_quantity": 1,
         "prep_time_hours": 24,
-        "images": ["https://images.unsplash.com/photo-1519676867240-f03562e64548?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/Patishapta.webp"]
     },
     {
-        "orig_id": "20",
-        "slug": "patishapta",
-        "name": "Patishapta",
+        "orig_id": "pitha-3",
+        "slug": "puli-pitha-10pc",
+        "name": "Puli Pitha (10 pieces)",
         "category_slug": "pitha",
-        "description": "Delicate, thin crepes made from rice flour batter, filled with a rich mixture of coconut, milk reduction (kheer), and cardamom, rolled beautifully.",
-        "price_cents": 250,
-        "unit_label": "per pc",
+        "description": "Steamed or fried half-moon dumplings stuffed with coconut and jaggery.",
+        "price_cents": 2500,
+        "unit_label": "10 pieces",
         "product_type": "standard",
         "in_stock": True,
         "preorder_only": True,
-        "min_quantity": 10,
+        "min_quantity": 1,
         "prep_time_hours": 24,
-        "images": ["https://images.unsplash.com/photo-1587314168485-3236d6710814?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/PuliPitha.webp"]
+    },
+    # Mishti Per Pound
+    {
+        "orig_id": "mpp-1",
+        "slug": "katari-bhog-lb",
+        "name": "Katari Bhog",
+        "category_slug": "mishti-per-pound",
+        "description": "Premium regional delicacy known for its unique texture and authentic, rich taste.",
+        "price_cents": 1500,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/KatariBhog.webp"]
+    },
+    {
+        "orig_id": "mpp-2",
+        "slug": "brown-chom-chom-lb",
+        "name": "Brown Chom Chom",
+        "category_slug": "mishti-per-pound",
+        "description": "Classic rich and caramelized Bengali sweet, deeply satisfying and soaked in sweet syrup.",
+        "price_cents": 1300,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/BrownChomChom.webp"]
+    },
+    {
+        "orig_id": "mpp-3",
+        "slug": "malai-kari-lb",
+        "name": "Malai Kari",
+        "category_slug": "mishti-per-pound",
+        "description": "Luxuriously soft sweets drenched in a thickened, sweetened milk infused with cardamom.",
+        "price_cents": 1300,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/MalaiKari.webp"]
+    },
+    {
+        "orig_id": "mpp-4",
+        "slug": "shandesh-lb",
+        "name": "Shandesh",
+        "category_slug": "mishti-per-pound",
+        "description": "Delicate milk-based sweet, perfectly balanced and adorned with a touch of tradition.",
+        "price_cents": 1300,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/Shandesh.webp"]
+    },
+    {
+        "orig_id": "mpp-5",
+        "slug": "kheer-mouchak-lb",
+        "name": "Kheer Mouchak",
+        "category_slug": "mishti-per-pound",
+        "description": "A honeycomb-shaped royal delight made with chenna, soaked in saffron syrup, and covered with creamy kheer.",
+        "price_cents": 1300,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/KheerMouchak.webp"]
+    },
+    {
+        "orig_id": "mpp-6",
+        "slug": "kala-jamun-sandwich-lb",
+        "name": "Kala Jamun Sandwich",
+        "category_slug": "mishti-per-pound",
+        "description": "An elegant presentation of classic Kala Jamun, beautifully layered with rich malai cream.",
+        "price_cents": 1300,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/KalujamSandwich.webp"]
+    },
+    {
+        "orig_id": "mpp-7",
+        "slug": "laddu-lb",
+        "name": "Laddu",
+        "category_slug": "mishti-per-pound",
+        "description": "Perfectly round and irresistibly sweet, our laddus melt in your mouth with every bite.",
+        "price_cents": 1300,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/Laddu.webp"]
+    },
+    {
+        "orig_id": "mpp-8",
+        "slug": "sponge-roshogolla-lb",
+        "name": "Sponge RoshoGolla",
+        "category_slug": "mishti-per-pound",
+        "description": "Incredibly soft and spongy cottage cheese balls soaked in a light, sweet syrup.",
+        "price_cents": 1300,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/SpongeRoshoGolla.webp"]
+    },
+    {
+        "orig_id": "mpp-9",
+        "slug": "white-chom-chom-lb",
+        "name": "White Chom Chom",
+        "category_slug": "mishti-per-pound",
+        "description": "Soft, spongy, and delicately sweet, these traditional white treats are a timeless favorite.",
+        "price_cents": 1200,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/WhiteChomChom.webp"]
+    },
+    {
+        "orig_id": "mpp-10",
+        "slug": "kalojam-lb",
+        "name": "Kalojam",
+        "category_slug": "mishti-per-pound",
+        "description": "Deep-fried to a beautiful dark color, our KaloJam offers a rich, dense texture bursting with flavor.",
+        "price_cents": 1200,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/KaloJam.webp"]
+    },
+    {
+        "orig_id": "mpp-11",
+        "slug": "rajbhog-lb",
+        "name": "Rajbhog",
+        "category_slug": "mishti-per-pound",
+        "description": "A majestic, saffron-infused spongy sweet filled with premium nuts and cardamom.",
+        "price_cents": 1200,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/RajBhog.webp"]
+    },
+    {
+        "orig_id": "mpp-12",
+        "slug": "gulab-jamun-lb",
+        "name": "Gulab Jamun",
+        "category_slug": "mishti-per-pound",
+        "description": "Golden, soft, and warm, soaking in a fragrant rose and cardamom syrup.",
+        "price_cents": 1200,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/GulabJamun.webp"]
+    },
+    {
+        "orig_id": "mpp-13",
+        "slug": "classic-roshogolla-lb",
+        "name": "Classic RoshoGolla",
+        "category_slug": "mishti-per-pound",
+        "description": "Traditional Bengali sweet made of chenna balls boiled in light sugar syrup.",
+        "price_cents": 1200,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/ClassRoshGolla.webp"]
     },
     # CUSTOM BOXES (Mix & Match and Assorted)
     {
@@ -306,7 +493,7 @@ PRODUCTS_DATA = [
         "price_cents": 500,
         "product_type": "custom_box",
         "in_stock": True,
-        "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/murad-logo.jpg"]
     },
     {
         "orig_id": "mixmatch-6",
@@ -317,7 +504,7 @@ PRODUCTS_DATA = [
         "price_cents": 1000,
         "product_type": "custom_box",
         "in_stock": True,
-        "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/murad-logo.jpg"]
     },
     {
         "orig_id": "mixmatch-9",
@@ -328,11 +515,12 @@ PRODUCTS_DATA = [
         "price_cents": 1500,
         "product_type": "custom_box",
         "in_stock": True,
-        "images": ["https://images.unsplash.com/photo-1601356616077-695728ecf769?w=600&auto=format&fit=crop&q=80"]
+        "images": ["/murad-logo.jpg"]
     }
 ]
 
 async def seed_database():
+    print(settings.async_database_url)
     # Connect directly using SQLAlchemy async session
     engine = create_async_engine(settings.async_database_url, echo=True)
     async_session = sessionmaker(

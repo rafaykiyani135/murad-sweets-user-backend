@@ -172,6 +172,7 @@ async def calculate_quote(
                         detail=f"Selected items count ({total_selected}) must match box size ({box_size})."
                     )
                 # For assorted, we validate that the sweet name matches a valid dry-sweet
+                enriched_selected_items = []
                 for selected in selected_items:
                     sweet_name = selected.get("name")
                     sweet_res = await db.execute(
@@ -188,6 +189,15 @@ async def calculate_quote(
                             status_code=400,
                             detail=f"Invalid assorted sweet: {sweet_name}. Must be an active in-stock dry sweet."
                         )
+                    
+                    enriched_selected_items.append({
+                        "id": str(sweet.id),
+                        "name": sweet.name,
+                        "quantity": 1
+                    })
+                
+                # Replace selections with the enriched items so inventory deduction works
+                selections_data["selectedItems"] = enriched_selected_items
 
         subtotal_cents += line_total_cents
 
