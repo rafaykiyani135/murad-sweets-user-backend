@@ -60,7 +60,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["/KaloJam.webp"]
+        "images": ["/KaloJam.png"]
     },
     {
         "orig_id": "2",
@@ -72,7 +72,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["/BrownChomChom.webp"]
+        "images": ["/BrownChomChom.png"]
     },
     {
         "orig_id": "3",
@@ -84,7 +84,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["/WhiteChomChom.webp"]
+        "images": ["/WhiteChomChom.png"]
     },
     {
         "orig_id": "4",
@@ -96,7 +96,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["/KalujamSandwich.webp"]
+        "images": ["/KalujamSandwich.png"]
     },
     {
         "orig_id": "5",
@@ -108,7 +108,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["/KheerMouchak.webp"]
+        "images": ["/KheerMouchak.png"]
     },
     {
         "orig_id": "6",
@@ -120,7 +120,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["/MalaiKari.webp"]
+        "images": ["/MalaiKari.png"]
     },
     {
         "orig_id": "7",
@@ -132,7 +132,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["/RajBhog.webp"]
+        "images": ["/RajBhog.png"]
     },
     {
         "orig_id": "8",
@@ -144,7 +144,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["/KatariBhog.webp"]
+        "images": ["/KatariBhog.png"]
     },
     {
         "orig_id": "9",
@@ -156,7 +156,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["/Laddu.webp"]
+        "images": ["/Laddu.png"]
     },
     {
         "orig_id": "10",
@@ -168,7 +168,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["/Shandesh.webp"]
+        "images": ["/Shandesh.png"]
     },
     {
         "orig_id": "11",
@@ -180,7 +180,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": True,
         "quantity_on_hand": 50,
-        "images": ["/gulab-jamun.png"]
+        "images": ["/GulabJamun.png"]
     },
     {
         "orig_id": "12",
@@ -192,7 +192,7 @@ PRODUCTS_DATA = [
         "product_type": "selection_item",
         "in_stock": False,  # Sold out in frontend
         "quantity_on_hand": 0,
-        "images": ["/Peda.webp"]
+        "images": ["/Peda.png"]
     },
     # Specialty
     {
@@ -205,7 +205,7 @@ PRODUCTS_DATA = [
         "unit_label": "Half Tray",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/MalaiJardaTray.webp"]
+        "images": ["/MalaiJardaTray.png"]
     },
     {
         "orig_id": "spec-2",
@@ -217,7 +217,7 @@ PRODUCTS_DATA = [
         "unit_label": "Half Tray",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/RoshMalaiTray.webp"]
+        "images": ["/RoshMalaiTray.png"]
     },
     {
         "orig_id": "spec-3",
@@ -229,7 +229,7 @@ PRODUCTS_DATA = [
         "unit_label": "16 oz",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/MishtiDoi.webp"]
+        "images": ["/MishtiDoi.png"]
     },
     {
         "orig_id": "spec-4",
@@ -241,7 +241,7 @@ PRODUCTS_DATA = [
         "unit_label": "per piece",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/RasMalai.webp"]
+        "images": ["/RasMalai.png"]
     },
     {
         "orig_id": "spec-5",
@@ -253,7 +253,7 @@ PRODUCTS_DATA = [
         "unit_label": "per container",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/PayeshKheer.webp"]
+        "images": ["/PayeshKheer.png"]
     },
     # Party Trays
     {
@@ -266,7 +266,7 @@ PRODUCTS_DATA = [
         "unit_label": "per tray (~18 pcs)",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/SmallPartyTray.webp"]
+        "images": ["/SmallPartyTray.png"]
     },
     {
         "orig_id": "17",
@@ -278,7 +278,7 @@ PRODUCTS_DATA = [
         "unit_label": "per tray (~40 pcs)",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/LargePartyTray.webp"]
+        "images": ["/LargePartyTray.png"]
     },
     # Pitha
     {
@@ -294,7 +294,7 @@ PRODUCTS_DATA = [
         "preorder_only": True,
         "min_quantity": 1,
         "prep_time_hours": 24,
-        "images": ["/NokshiPitha.webp"]
+        "images": ["/NokshiPitha.png"]
     },
     {
         "orig_id": "pitha-2",
@@ -309,7 +309,7 @@ PRODUCTS_DATA = [
         "preorder_only": True,
         "min_quantity": 1,
         "prep_time_hours": 24,
-        "images": ["/Patishapta.webp"]
+        "images": ["/Patishapta.png"]
     },
     {
         "orig_id": "pitha-3",
@@ -324,7 +324,7 @@ PRODUCTS_DATA = [
         "preorder_only": True,
         "min_quantity": 1,
         "prep_time_hours": 24,
-        "images": ["/PuliPitha.webp"]
+        "images": ["/PuliPitha.png"]
     },
     # Mishti Per Pound
     {
@@ -337,7 +337,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/KatariBhog.webp"]
+        "images": ["/KatariBhog.png"]
     },
     {
         "orig_id": "mpp-2",
@@ -349,7 +349,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/BrownChomChom.webp"]
+        "images": ["/BrownChomChom.png"]
     },
     {
         "orig_id": "mpp-3",
@@ -361,7 +361,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/MalaiKari.webp"]
+        "images": ["/MalaiKari.png"]
     },
     {
         "orig_id": "mpp-4",
@@ -373,7 +373,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/Shandesh.webp"]
+        "images": ["/Shandesh.png"]
     },
     {
         "orig_id": "mpp-5",
@@ -385,7 +385,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/KheerMouchak.webp"]
+        "images": ["/KheerMouchak.png"]
     },
     {
         "orig_id": "mpp-6",
@@ -397,7 +397,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/KalujamSandwich.webp"]
+        "images": ["/KalujamSandwich.png"]
     },
     {
         "orig_id": "mpp-7",
@@ -409,7 +409,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/Laddu.webp"]
+        "images": ["/Laddu.png"]
     },
     {
         "orig_id": "mpp-8",
@@ -421,7 +421,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/SpongeRoshoGolla.webp"]
+        "images": ["/SpongeRoshoGolla.png"]
     },
     {
         "orig_id": "mpp-9",
@@ -433,7 +433,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/WhiteChomChom.webp"]
+        "images": ["/WhiteChomChom.png"]
     },
     {
         "orig_id": "mpp-10",
@@ -445,7 +445,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/KaloJam.webp"]
+        "images": ["/KaloJam.png"]
     },
     {
         "orig_id": "mpp-11",
@@ -457,7 +457,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/RajBhog.webp"]
+        "images": ["/RajBhog.png"]
     },
     {
         "orig_id": "mpp-12",
@@ -469,7 +469,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/GulabJamun.webp"]
+        "images": ["/GulabJamun.png"]
     },
     {
         "orig_id": "mpp-13",
@@ -481,7 +481,7 @@ PRODUCTS_DATA = [
         "unit_label": "per lb",
         "product_type": "standard",
         "in_stock": True,
-        "images": ["/ClassRoshGolla.webp"]
+        "images": ["/ClassRoshGolla.png"]
     },
     # CUSTOM BOXES (Mix & Match and Assorted)
     {
@@ -493,7 +493,7 @@ PRODUCTS_DATA = [
         "price_cents": 500,
         "product_type": "custom_box",
         "in_stock": True,
-        "images": ["/murad-logo.jpg"]
+        "images": ["/3-piece-box.png"]
     },
     {
         "orig_id": "mixmatch-6",
@@ -504,7 +504,7 @@ PRODUCTS_DATA = [
         "price_cents": 1000,
         "product_type": "custom_box",
         "in_stock": True,
-        "images": ["/murad-logo.jpg"]
+        "images": ["/6-piece-box.png"]
     },
     {
         "orig_id": "mixmatch-9",
@@ -515,7 +515,7 @@ PRODUCTS_DATA = [
         "price_cents": 1500,
         "product_type": "custom_box",
         "in_stock": True,
-        "images": ["/murad-logo.jpg"]
+        "images": ["/9-piece-box.png"]
     }
 ]
 
@@ -589,6 +589,8 @@ async def seed_database():
                 # Update quantity_on_hand on re-seed only if explicitly set in data
                 if "quantity_on_hand" in prod_data and product.quantity_on_hand is None:
                     product.quantity_on_hand = prod_data["quantity_on_hand"]
+                # Update metadata_json (images) to sync with any changes
+                product.metadata_json = {"images": prod_data["images"]}
                 
         # Seed default Admin User
         admin_username = "admin"
