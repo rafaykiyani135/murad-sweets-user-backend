@@ -98,18 +98,18 @@ PRODUCTS_DATA = [
         "quantity_on_hand": 50,
         "images": ["/KalujamSandwich.png"]
     },
-    {
-        "orig_id": "5",
-        "slug": "kheer-mouchak",
-        "name": "Kheer Mouchak",
-        "category_slug": "dry-sweets",
-        "description": "A honeycomb-shaped royal delight made with chenna, soaked in saffron syrup, and covered with creamy, reduced milk kheer.",
-        "price_cents": 0,
-        "product_type": "selection_item",
-        "in_stock": True,
-        "quantity_on_hand": 50,
-        "images": ["/KheerMouchak.png"]
-    },
+    # {
+    #     "orig_id": "5",
+    #     "slug": "kheer-mouchak",
+    #     "name": "Kheer Mouchak",
+    #     "category_slug": "dry-sweets",
+    #     "description": "A honeycomb-shaped royal delight made with chenna, soaked in saffron syrup, and covered with creamy, reduced milk kheer.",
+    #     "price_cents": 0,
+    #     "product_type": "selection_item",
+    #     "in_stock": True,
+    #     "quantity_on_hand": 50,
+    #     "images": ["/KheerMouchak.png"]
+    # },
     {
         "orig_id": "6",
         "slug": "malaikari",
@@ -375,18 +375,18 @@ PRODUCTS_DATA = [
         "in_stock": True,
         "images": ["/Shandesh.png"]
     },
-    {
-        "orig_id": "mpp-5",
-        "slug": "kheer-mouchak-lb",
-        "name": "Kheer Mouchak",
-        "category_slug": "mishti-per-pound",
-        "description": "A honeycomb-shaped royal delight made with chenna, soaked in saffron syrup, and covered with creamy kheer.",
-        "price_cents": 1300,
-        "unit_label": "per lb",
-        "product_type": "standard",
-        "in_stock": True,
-        "images": ["/KheerMouchak.png"]
-    },
+    # {
+    #     "orig_id": "mpp-5",
+    #     "slug": "kheer-mouchak-lb",
+    #     "name": "Kheer Mouchak",
+    #     "category_slug": "mishti-per-pound",
+    #     "description": "A honeycomb-shaped royal delight made with chenna, soaked in saffron syrup, and covered with creamy kheer.",
+    #     "price_cents": 1300,
+    #     "unit_label": "per lb",
+    #     "product_type": "standard",
+    #     "in_stock": True,
+    #     "images": ["/KheerMouchak.png"]
+    # },
     {
         "orig_id": "mpp-6",
         "slug": "kala-jamun-sandwich-lb",
@@ -411,18 +411,18 @@ PRODUCTS_DATA = [
         "in_stock": True,
         "images": ["/Laddu.png"]
     },
-    {
-        "orig_id": "mpp-8",
-        "slug": "sponge-roshogolla-lb",
-        "name": "Sponge RoshoGolla",
-        "category_slug": "mishti-per-pound",
-        "description": "Incredibly soft and spongy cottage cheese balls soaked in a light, sweet syrup.",
-        "price_cents": 1300,
-        "unit_label": "per lb",
-        "product_type": "standard",
-        "in_stock": True,
-        "images": ["/SpongeRoshoGolla.png"]
-    },
+    # {
+    #     "orig_id": "mpp-8",
+    #     "slug": "sponge-roshogolla-lb",
+    #     "name": "Sponge RoshoGolla",
+    #     "category_slug": "mishti-per-pound",
+    #     "description": "Incredibly soft and spongy cottage cheese balls soaked in a light, sweet syrup.",
+    #     "price_cents": 1300,
+    #     "unit_label": "per lb",
+    #     "product_type": "standard",
+    #     "in_stock": True,
+    #     "images": ["/SpongeRoshoGolla.png"]
+    # },
     {
         "orig_id": "mpp-9",
         "slug": "white-chom-chom-lb",

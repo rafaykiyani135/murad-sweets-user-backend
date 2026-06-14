@@ -6,6 +6,7 @@ NOTE: This is intentionally unauthenticated for now. When migrated to the
 real /admin panel, JWT protection will be added.
 """
 
+import uuid
 from datetime import datetime
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
@@ -97,10 +98,10 @@ async def history_update_order_status(
     db: AsyncSession = Depends(get_db)
 ):
     """
-    Update the status of an order to: pending, completed, or cancelled.
+    Update the status of an order.
     When cancelled, inventory is automatically restored.
     """
-    allowed = {"pending", "completed", "cancelled"}
+    allowed = {"pending", "confirmed", "preparing", "ready", "out_for_delivery", "completed", "cancelled"}
     if payload.status not in allowed:
         raise HTTPException(
             status_code=400,
@@ -135,6 +136,51 @@ async def history_update_order_status(
         fulfillment_type=order.fulfillment_type,
         created_at=order.created_at,
     )
+
+
+@router.get("/orders/{order_number}")
+async def history_get_order(
+    order_number: str,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Get detailed order information by order number.
+    """
+    result = await db.execute(
+        select(Order)
+        .options(selectinload(Order.customer), selectinload(Order.items))
+        .where(Order.order_number == order_number)
+    )
+    order = result.scalar_one_or_none()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    return {
+        "order_number": order.order_number,
+        "status": order.status,
+        "customer": {
+            "full_name": order.customer.full_name if order.customer else "Unknown",
+            "email": order.customer.email if order.customer else "",
+            "phone": order.customer.phone if order.customer else "",
+        },
+        "total": order.total_cents / 100.0,
+        "scheduled_date": order.scheduled_date.isoformat(),
+        "scheduled_slot": order.scheduled_slot,
+        "fulfillment_type": order.fulfillment_type,
+        "created_at": order.created_at.isoformat() if order.created_at else None,
+        "notes": order.notes,
+        "admin_notes": order.admin_notes,
+        "items": [
+            {
+                "name": item.name_snapshot,
+                "unit_price": item.unit_price_cents / 100.0,
+                "quantity": item.quantity,
+                "line_total": item.line_total_cents / 100.0,
+                "selections": item.selections,
+            }
+            for item in order.items
+        ]
+    }
 
 
 @router.post("/orders", response_model=OrderSummary, status_code=201)
@@ -291,3 +337,36 @@ async def history_stock(db: AsyncSession = Depends(get_db)):
         )
         for p in products
     ]
+
+
+class HistoryStockUpdate(BaseModel):
+    quantity_on_hand: int
+    is_in_stock: bool
+
+
+@router.patch("/stock/{product_id}")
+async def history_update_stock(
+    product_id: uuid.UUID,
+    payload: HistoryStockUpdate,
+    db: AsyncSession = Depends(get_db)
+):
+    """
+    Update a product's stock levels.
+    """
+    result = await db.execute(
+        select(Product)
+        .where(Product.id == product_id)
+    )
+    product = result.scalar_one_or_none()
+    if not product:
+        raise HTTPException(status_code=404, detail="Product not found")
+
+    product.quantity_on_hand = payload.quantity_on_hand
+    product.is_in_stock = payload.is_in_stock
+
+    await db.commit()
+    return {
+        "product_id": str(product.id),
+        "quantity_on_hand": product.quantity_on_hand,
+        "is_in_stock": product.is_in_stock
+    }
