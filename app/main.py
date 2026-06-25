@@ -15,6 +15,7 @@ async def lifespan(app: FastAPI):
     from app.models.order import Order, OrderItem
     from app.models.inquiry import Inquiry
     from app.models.admin_user import AdminUser
+    from app.models.setting import AppSetting
     
     # Auto-create tables for development convenience (especially when using SQLite)
     async with engine.begin() as conn:
