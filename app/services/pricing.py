@@ -9,8 +9,7 @@ from app.models.category import Category
 
 # Allowed ZIP Codes for Delivery
 ALLOWED_ZIP_CODES = {"11218", "11219", "11230", "11225", "11226", "11204", "11210"}
-DELIVERY_MINIMUM_CENTS = 1500  # $15.00 minimum order subtotal for delivery
-DELIVERY_FEE_CENTS = 500       # $5.00 flat delivery fee
+# Delivery variables are now managed by frontend distance calculator
 
 def get_deterministic_uuid(frontend_id: str) -> uuid.UUID:
     """Generate a deterministic UUID from the frontend ID."""
@@ -40,16 +39,11 @@ async def calculate_quote(
     validated_items = []
     max_prep_time_hours = 0
 
-    # 1. Validate Fulfillment and ZIP Code
+    # 1. Validate Fulfillment (Removed outdated ZIP code check)
     if fulfillment_type == "delivery":
         if not zip_code:
-            raise HTTPException(status_code=400, detail="ZIP code is required for delivery.")
-        clean_zip = zip_code.strip()
-        if clean_zip not in ALLOWED_ZIP_CODES:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Delivery to ZIP {clean_zip} is not available. We only deliver to Brooklyn zones: {', '.join(sorted(ALLOWED_ZIP_CODES))}."
-            )
+            pass # ZIP codes are now handled by the frontend distance calculator
+
 
     # 2. Process and Recalculate each item
     for item in items:
@@ -210,17 +204,12 @@ async def calculate_quote(
             "selections": selections_data
         })
 
-    # 4. Enforce delivery minimum order value
-    if fulfillment_type == "delivery" and subtotal_cents < DELIVERY_MINIMUM_CENTS:
-        raise HTTPException(
-            status_code=400,
-            detail=f"Minimum subtotal for delivery is ${DELIVERY_MINIMUM_CENTS / 100:.2f}. Your current subtotal is ${subtotal_cents / 100:.2f}."
-        )
-
-    # 5. Calculate delivery fee
-    delivery_fee_cents = DELIVERY_FEE_CENTS if fulfillment_type == "delivery" else 0
+    # 4. Delivery Fee
+    # The backend quote no longer computes delivery fees (frontend calculates via Mapbox/OSRM distance).
+    # We return 0 here; the frontend adds its own dynamic delivery fee to the subtotal.
+    delivery_fee_cents = 0
     tax_cents = 0  # No tax in MVP
-    total_cents = subtotal_cents + delivery_fee_cents + tax_cents
+    total_cents = subtotal_cents + tax_cents
 
     return {
         "subtotal_cents": subtotal_cents,

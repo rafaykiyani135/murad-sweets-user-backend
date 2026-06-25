@@ -8,7 +8,7 @@ from app.db.session import get_db
 from app.models.category import Category
 from app.models.product import Product
 from app.schemas.catalog import CategoryOut, ProductOut, StoreSettingsOut
-from app.services.pricing import ALLOWED_ZIP_CODES, DELIVERY_FEE_CENTS, DELIVERY_MINIMUM_CENTS
+from app.services.pricing import ALLOWED_ZIP_CODES
 
 router = APIRouter()
 
@@ -82,8 +82,8 @@ async def get_store_settings():
         pickup_address="Brooklyn, NY 11218",
         pickup_instructions="Pickup is contact-free. The exact pickup location details will be sent in your confirmation email/SMS.",
         delivery_zones=list(ALLOWED_ZIP_CODES),
-        delivery_fee_cents=DELIVERY_FEE_CENTS,
-        delivery_minimum_cents=DELIVERY_MINIMUM_CENTS,
+        delivery_fee_cents=0,
+        delivery_minimum_cents=0,
         time_slots=[
             "Morning (10:00 AM – 1:00 PM)",
             "Afternoon (1:00 PM – 5:00 PM)",
