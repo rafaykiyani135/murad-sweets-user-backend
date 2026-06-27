@@ -18,12 +18,10 @@ class Settings(BaseSettings):
     JWT_ALGORITHM: str = Field(default="HS256")
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=720)  # 12 hours
 
-    # SMTP Settings
-    SMTP_HOST: str = Field(default="smtp.gmail.com")
-    SMTP_PORT: int = Field(default=587)
-    SMTP_USER: str = Field(default="")
-    SMTP_PASS: str = Field(default="")
-    OWNER_NOTIFICATION_EMAIL: str = Field(default="admin@muradsweets.com")
+    # Email (Resend)
+    RESEND_API_KEY: str = Field(default="")
+    EMAIL_FROM: str = Field(default="Murad Sweets <onboarding@resend.dev>")
+    OWNER_NOTIFICATION_EMAIL: str = Field(default="sherwindesouza9@gmail.com")
 
     # Stripe Settings
     STRIPE_SECRET_KEY: str = Field(default="")

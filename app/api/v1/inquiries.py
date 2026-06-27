@@ -4,6 +4,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.db.session import get_db
 from app.models.inquiry import Inquiry
 from app.schemas.inquiries import InquiryCreate, InquiryOut
+from app.services.notifications import send_inquiry_emails
 
 router = APIRouter()
 
@@ -21,4 +22,13 @@ async def create_inquiry(payload: InquiryCreate, db: AsyncSession = Depends(get_
     db.add(inquiry)
     await db.commit()
     await db.refresh(inquiry)
+
+    send_inquiry_emails(
+        full_name=payload.fullName,
+        email=payload.email,
+        phone=payload.phone,
+        message=payload.message,
+        subject=payload.subject,
+    )
+
     return inquiry

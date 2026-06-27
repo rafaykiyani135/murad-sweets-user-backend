@@ -12,3 +12,4 @@ python-dotenv
 bcrypt
 greenlet
 aiosqlite
+resend

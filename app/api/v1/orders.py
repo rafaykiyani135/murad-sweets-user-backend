@@ -185,7 +185,16 @@ async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db))
         total_cents=quote["total_cents"],
         fulfillment_type=payload.fulfillment,
         scheduled_date=payload.date,
-        scheduled_slot=payload.slot
+        scheduled_slot=payload.slot,
+        customer_phone=payload.phone,
+        items=[
+            {
+                "name": item.name_snapshot,
+                "quantity": item.quantity,
+                "line_total": item.line_total_cents / 100.0,
+            }
+            for item in order_detail.items
+        ],
     )
     
     return serialize_order(order_detail, client_secret=client_secret)
