@@ -1,5 +1,5 @@
 from fastapi import APIRouter
-from app.api.v1 import catalog, cart, orders, inquiries, admin, history, settings, products_admin
+from app.api.v1 import catalog, cart, orders, inquiries, admin, history, settings, products_admin, webhooks
 
 api_router = APIRouter()
 
@@ -12,3 +12,4 @@ api_router.include_router(admin.router, prefix="/admin", tags=["Admin"])
 api_router.include_router(history.router, prefix="/history", tags=["History"])
 api_router.include_router(settings.router, prefix="/settings", tags=["Settings"])
 api_router.include_router(products_admin.router, prefix="/admin/products", tags=["Products Admin"])
+api_router.include_router(webhooks.router, prefix="/webhooks", tags=["Webhooks"])

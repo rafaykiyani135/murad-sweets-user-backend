@@ -65,3 +65,23 @@ def verify_webhook_signature(payload: str, sig_header: str) -> dict:
     except Exception as e:
         print(f"Stripe Webhook verification failed: {e}")
         return {"type": "stripe", "verified": False, "error": str(e)}
+
+def check_payment_intent_status(order_number: str) -> str | None:
+    """
+    Search for a Stripe PaymentIntent for the given order number and return its status.
+    Returns None if Stripe is not configured, or if no intent is found.
+    """
+    if stripe is None or not settings.STRIPE_SECRET_KEY:
+        return None
+
+    try:
+        res = stripe.PaymentIntent.search(query=f"metadata['order_number']:'{order_number}'")
+        if res.data:
+            # Get the first matching intent
+            intent = res.data[0]
+            return intent.status
+    except Exception as e:
+        print(f"Stripe PaymentIntent search failed: {e}")
+    
+    return None
+

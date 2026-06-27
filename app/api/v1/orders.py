@@ -11,7 +11,7 @@ from app.schemas.orders import OrderCreate, OrderOut, OrderContactInfo, OrderIte
 from app.services.pricing import calculate_quote
 from app.services.scheduling import validate_schedule
 from app.services.order_numbers import generate_order_number
-from app.services.payments import create_payment_intent
+from app.services.payments import create_payment_intent, check_payment_intent_status
 from app.services.notifications import send_order_confirmation_emails
 from app.services.inventory import deduct_inventory
 
@@ -211,4 +211,14 @@ async def get_order(order_number: str, db: AsyncSession = Depends(get_db)):
     if not order:
         raise HTTPException(status_code=404, detail="Order not found")
         
+    # Auto-sync Stripe payment status if pending
+    if order.payment_method == "card" and order.payment_status == "pending":
+        stripe_status = check_payment_intent_status(order.order_number)
+        if stripe_status == "succeeded":
+            order.payment_status = "paid"
+            await db.commit()
+        elif stripe_status in ["canceled", "payment_failed"]:
+            order.payment_status = "failed"
+            await db.commit()
+
     return serialize_order(order)
