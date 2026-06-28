@@ -264,7 +264,7 @@ PRODUCTS_DATA = [
         "description": "A beautiful arrangement of 15-18 assorted premium dry sweets, perfect for family get-togethers and intimate celebrations.",
         "price_cents": 3000,
         "unit_label": "per tray (~18 pcs)",
-        "product_type": "standard",
+        "product_type": "custom_box",
         "in_stock": True,
         "images": ["/SmallPartyTray.png"]
     },
@@ -276,7 +276,7 @@ PRODUCTS_DATA = [
         "description": "A grand presentation tray with 35-40 pieces of our finest sweets, featuring an assortment of chom chom, kalojam, shandesh, and laddus.",
         "price_cents": 6000,
         "unit_label": "per tray (~40 pcs)",
-        "product_type": "standard",
+        "product_type": "custom_box",
         "in_stock": True,
         "images": ["/LargePartyTray.png"]
     },

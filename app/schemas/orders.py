@@ -17,6 +17,7 @@ class OrderCreate(BaseModel):
     phone: str
     notes: Optional[str] = None
     paymentMethod: str  # "cod" | "card"
+    deliveryFeeCents: Optional[int] = 0
     items: List[CartItemSchema]
 
 class OrderItemOut(BaseModel):

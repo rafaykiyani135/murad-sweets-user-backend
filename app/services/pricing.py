@@ -104,6 +104,10 @@ async def calculate_quote(
                 box_size = 6
             elif "9" in product.slug:
                 box_size = 9
+            elif "small-party-tray" in product.slug:
+                box_size = 18
+            elif "large-party-tray" in product.slug:
+                box_size = 40
 
             mix_match = item.get("mixMatch")
             assorted_box = item.get("assortedBox")

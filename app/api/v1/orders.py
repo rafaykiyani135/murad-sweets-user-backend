@@ -90,6 +90,11 @@ async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db))
         zip_code=payload.zip
     )
     
+    # 1.5 Apply delivery fee from frontend
+    if payload.fulfillment == "delivery":
+        quote["delivery_fee_cents"] = payload.deliveryFeeCents or 0
+        quote["total_cents"] = quote["subtotal_cents"] + quote["tax_cents"] + quote["delivery_fee_cents"]
+    
     # 2. Validate schedule
     try:
         scheduled_date = datetime.strptime(payload.date, "%Y-%m-%d").date()
