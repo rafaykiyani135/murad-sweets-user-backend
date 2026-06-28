@@ -5,8 +5,8 @@ from pydantic_settings import BaseSettings
 
 class Settings(BaseSettings):
     DATABASE_URL: str = Field(
-        default="sqlite+aiosqlite:///./murad_sweets.db",
-        description="Database connection URL. If using Postgres, use postgresql+asyncpg://"
+        default="postgresql+asyncpg://postgres:postgres@localhost:5432/murad_sweets",
+        description="Database connection URL. For Postgres, use postgresql+asyncpg://"
     )
     APP_ENV: str = Field(default="development")
     FRONTEND_ORIGIN: str = Field(default="http://localhost:3000")
@@ -50,9 +50,6 @@ class Settings(BaseSettings):
             url = url.replace("postgresql://", "postgresql+asyncpg://", 1)
         elif url.startswith("postgres://"):
             url = url.replace("postgres://", "postgresql+asyncpg://", 1)
-        # If using SQLite, convert to async sqlite if it isn't already
-        elif url.startswith("sqlite://") and not url.startswith("sqlite+aiosqlite://"):
-            url = url.replace("sqlite://", "sqlite+aiosqlite://", 1)
         return url
 
     class Config:

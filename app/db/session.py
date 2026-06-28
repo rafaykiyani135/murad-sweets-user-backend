@@ -11,13 +11,10 @@ except ImportError:
 from app.core.config import settings
 
 # Create database engine
-connect_args = {"check_same_thread": False} if settings.async_database_url.startswith("sqlite") else {}
-
 engine = create_async_engine(
     settings.async_database_url,
     echo=False,
     future=True,
-    connect_args=connect_args,
 )
 
 if _use_new_sessionmaker:

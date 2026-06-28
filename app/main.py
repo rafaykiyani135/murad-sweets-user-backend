@@ -17,7 +17,7 @@ async def lifespan(app: FastAPI):
     from app.models.admin_user import AdminUser
     from app.models.setting import AppSetting
     
-    # Auto-create tables for development convenience (especially when using SQLite)
+    # Auto-create tables for development convenience
     async with engine.begin() as conn:
         await conn.run_sync(Base.metadata.create_all)
         
