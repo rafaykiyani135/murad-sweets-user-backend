@@ -49,6 +49,58 @@ def create_payment_intent(amount_cents: int, currency: str = "usd", order_number
             "is_mock": True
         }
 
+def create_checkout_session(amount_cents: int, currency: str = "usd", order_number: str = "", customer_email: str = "") -> dict:
+    """
+    Creates a Stripe Checkout Session for official Stripe redirect flow.
+    Falls back to a mock checkout session if Stripe is not installed or keys are missing.
+    """
+    if stripe is None or not settings.STRIPE_SECRET_KEY:
+        # Return mock checkout details for local testing
+        return {
+            "checkout_url": f"{settings.FRONTEND_ORIGIN}/order-confirmation/{order_number}",
+            "id": f"cs_mock_{order_number}",
+            "status": "open",
+            "is_mock": True
+        }
+
+    try:
+        session = stripe.checkout.Session.create(
+            payment_method_types=['card'],
+            line_items=[{
+                'price_data': {
+                    'currency': currency,
+                    'product_data': {
+                        'name': f"Order #{order_number} - Murad Sweets",
+                    },
+                    'unit_amount': amount_cents,
+                },
+                'quantity': 1,
+            }],
+            mode='payment',
+            success_url=f"{settings.FRONTEND_ORIGIN}/order-confirmation/{order_number}?success=true",
+            cancel_url=f"{settings.FRONTEND_ORIGIN}/checkout",
+            payment_intent_data={
+                'metadata': {'order_number': order_number}
+            },
+            metadata={"order_number": order_number},
+            customer_email=customer_email or None,
+        )
+        return {
+            "checkout_url": session.url,
+            "id": session.id,
+            "status": session.status,
+            "is_mock": False
+        }
+    except Exception as e:
+        print(f"Stripe Checkout Session creation failed: {e}")
+        # fallback to mock
+        return {
+            "checkout_url": f"{settings.FRONTEND_ORIGIN}/order-confirmation/{order_number}",
+            "id": f"cs_mock_fallback_{order_number}",
+            "status": "open",
+            "is_mock": True
+        }
+
 def verify_webhook_signature(payload: str, sig_header: str) -> dict:
     """
     Verifies the webhook signature sent by Stripe.

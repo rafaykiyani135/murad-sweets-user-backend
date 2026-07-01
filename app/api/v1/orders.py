@@ -11,13 +11,13 @@ from app.schemas.orders import OrderCreate, OrderOut, OrderContactInfo, OrderIte
 from app.services.pricing import calculate_quote
 from app.services.scheduling import validate_schedule
 from app.services.order_numbers import generate_order_number
-from app.services.payments import create_payment_intent, check_payment_intent_status
+from app.services.payments import create_checkout_session, check_payment_intent_status
 from app.services.notifications import send_order_confirmation_emails
 from app.services.inventory import deduct_inventory
 
 router = APIRouter()
 
-def serialize_order(order: Order, client_secret: str = None) -> OrderOut:
+def serialize_order(order: Order, client_secret: str = None, checkout_url: str = None) -> OrderOut:
     """Helper to convert database Order models to OrderOut schemas."""
     contact = OrderContactInfo(
         fullName=order.customer.full_name,
@@ -63,6 +63,7 @@ def serialize_order(order: Order, client_secret: str = None) -> OrderOut:
         payment_method=order.payment_method,
         payment_status=order.payment_status,
         client_secret=client_secret,
+        checkout_url=checkout_url,
         admin_notes=order.admin_notes,
         created_at=order.created_at,
         updated_at=order.updated_at,
@@ -126,10 +127,10 @@ async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db))
     order_number = await generate_order_number(db)
     
     # 5. Handle optional Stripe setup
-    client_secret = None
+    checkout_url = None
     if payload.paymentMethod == "card":
-        intent = create_payment_intent(quote["total_cents"], "usd", order_number)
-        client_secret = intent.get("client_secret")
+        session = create_checkout_session(quote["total_cents"], "usd", order_number, payload.email)
+        checkout_url = session.get("checkout_url")
         
     # 6. Save order
     order = Order(
@@ -202,7 +203,7 @@ async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db))
         ],
     )
     
-    return serialize_order(order_detail, client_secret=client_secret)
+    return serialize_order(order_detail, checkout_url=checkout_url)
 
 @router.get("/{order_number}", response_model=OrderOut)
 async def get_order(order_number: str, db: AsyncSession = Depends(get_db)):

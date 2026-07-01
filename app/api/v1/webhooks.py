@@ -27,16 +27,16 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
         event_type = event.get('type')
         data_obj = event.get('data', {}).get('object', {})
         
-        # We stored the order_number in metadata when creating the payment intent
+        # We stored the order_number in metadata when creating the payment intent/checkout session
         order_number = data_obj.get("metadata", {}).get("order_number")
         
         if order_number:
             result = await db.execute(select(Order).where(Order.order_number == order_number))
             order = result.scalar_one_or_none()
             if order:
-                if event_type == 'payment_intent.succeeded':
+                if event_type in ('payment_intent.succeeded', 'checkout.session.completed'):
                     order.payment_status = "paid"
-                elif event_type == 'payment_intent.payment_failed':
+                elif event_type in ('payment_intent.payment_failed', 'checkout.session.expired'):
                     order.payment_status = "failed"
                 await db.commit()
     else:
@@ -51,9 +51,9 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
                 result = await db.execute(select(Order).where(Order.order_number == order_number))
                 order = result.scalar_one_or_none()
                 if order:
-                    if event_type == 'payment_intent.succeeded':
+                    if event_type in ('payment_intent.succeeded', 'checkout.session.completed'):
                         order.payment_status = "paid"
-                    elif event_type == 'payment_intent.payment_failed':
+                    elif event_type in ('payment_intent.payment_failed', 'checkout.session.expired'):
                         order.payment_status = "failed"
                     await db.commit()
         except Exception as e:

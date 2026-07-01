@@ -69,6 +69,7 @@ class OrderOut(BaseModel):
     payment_method: str
     payment_status: str
     client_secret: Optional[str] = None  # Stripe client secret if card payment
+    checkout_url: Optional[str] = None  # Stripe checkout url if redirect flow
     
     admin_notes: Optional[str] = None
     created_at: datetime
