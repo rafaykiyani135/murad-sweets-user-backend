@@ -1,5 +1,5 @@
 from datetime import datetime
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, Request
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
 from sqlalchemy.orm import selectinload
@@ -72,7 +72,7 @@ def serialize_order(order: Order, client_secret: str = None, checkout_url: str =
     )
 
 @router.post("", response_model=OrderOut, status_code=status.HTTP_201_CREATED)
-async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db)):
+async def create_order(payload: OrderCreate, request: Request, db: AsyncSession = Depends(get_db)):
     """
     Create a new order:
     1. Recalculates cart quote based on DB prices.
@@ -129,8 +129,23 @@ async def create_order(payload: OrderCreate, db: AsyncSession = Depends(get_db))
     # 5. Handle optional Stripe setup
     checkout_url = None
     if payload.paymentMethod == "card":
-        session = create_checkout_session(quote["total_cents"], "usd", order_number, payload.email)
-        checkout_url = session.get("checkout_url")
+        # Extract requesting origin to redirect user back to the correct environment
+        origin = request.headers.get("origin") or request.headers.get("referer")
+        frontend_url = None
+        if origin:
+            from urllib.parse import urlparse
+            parsed = urlparse(origin)
+            if parsed.scheme and parsed.netloc:
+                frontend_url = f"{parsed.scheme}://{parsed.netloc}"
+        
+        try:
+            session = create_checkout_session(quote["total_cents"], "usd", order_number, payload.email, frontend_url=frontend_url)
+            checkout_url = session.get("checkout_url")
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Card payments are currently unavailable: {str(e)}"
+            )
         
     # 6. Save order
     order = Order(

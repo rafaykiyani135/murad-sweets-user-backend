@@ -10,18 +10,9 @@ except ImportError:
 def create_payment_intent(amount_cents: int, currency: str = "usd", order_number: str = "") -> dict:
     """
     Creates a Stripe PaymentIntent for frontend Elements integration.
-    Falls back to a mock intent if Stripe is not installed or keys are missing.
     """
     if stripe is None or not settings.STRIPE_SECRET_KEY:
-        # Return mock intent details for local testing
-        return {
-            "client_secret": f"pi_mock_secret_for_{order_number}_{amount_cents}",
-            "id": f"pi_mock_{order_number}",
-            "amount": amount_cents,
-            "currency": currency,
-            "status": "requires_payment_method",
-            "is_mock": True
-        }
+        raise RuntimeError("Stripe is not configured or keys are missing.")
 
     try:
         intent = stripe.PaymentIntent.create(
@@ -39,29 +30,16 @@ def create_payment_intent(amount_cents: int, currency: str = "usd", order_number
         }
     except Exception as e:
         print(f"Stripe PaymentIntent creation failed: {e}")
-        # fallback to mock
-        return {
-            "client_secret": f"pi_mock_fallback_secret_for_{order_number}_{amount_cents}",
-            "id": f"pi_mock_fallback_{order_number}",
-            "amount": amount_cents,
-            "currency": currency,
-            "status": "requires_payment_method",
-            "is_mock": True
-        }
+        raise
 
-def create_checkout_session(amount_cents: int, currency: str = "usd", order_number: str = "", customer_email: str = "") -> dict:
+def create_checkout_session(amount_cents: int, currency: str = "usd", order_number: str = "", customer_email: str = "", frontend_url: str = None) -> dict:
     """
     Creates a Stripe Checkout Session for official Stripe redirect flow.
-    Falls back to a mock checkout session if Stripe is not installed or keys are missing.
     """
+    base_url = frontend_url or settings.FRONTEND_ORIGIN
+
     if stripe is None or not settings.STRIPE_SECRET_KEY:
-        # Return mock checkout details for local testing
-        return {
-            "checkout_url": f"{settings.FRONTEND_ORIGIN}/order-confirmation/{order_number}",
-            "id": f"cs_mock_{order_number}",
-            "status": "open",
-            "is_mock": True
-        }
+        raise RuntimeError("Stripe is not configured or keys are missing.")
 
     try:
         session = stripe.checkout.Session.create(
@@ -77,8 +55,8 @@ def create_checkout_session(amount_cents: int, currency: str = "usd", order_numb
                 'quantity': 1,
             }],
             mode='payment',
-            success_url=f"{settings.FRONTEND_ORIGIN}/order-confirmation/{order_number}?success=true",
-            cancel_url=f"{settings.FRONTEND_ORIGIN}/checkout",
+            success_url=f"{base_url}/order-confirmation/{order_number}?success=true",
+            cancel_url=f"{base_url}/checkout",
             payment_intent_data={
                 'metadata': {'order_number': order_number}
             },
@@ -93,21 +71,14 @@ def create_checkout_session(amount_cents: int, currency: str = "usd", order_numb
         }
     except Exception as e:
         print(f"Stripe Checkout Session creation failed: {e}")
-        # fallback to mock
-        return {
-            "checkout_url": f"{settings.FRONTEND_ORIGIN}/order-confirmation/{order_number}",
-            "id": f"cs_mock_fallback_{order_number}",
-            "status": "open",
-            "is_mock": True
-        }
+        raise
 
 def verify_webhook_signature(payload: str, sig_header: str) -> dict:
     """
     Verifies the webhook signature sent by Stripe.
     """
     if stripe is None or not settings.STRIPE_WEBHOOK_SECRET or not settings.STRIPE_SECRET_KEY:
-        # Mock webhook processing
-        return {"type": "mock", "verified": True}
+        raise RuntimeError("Stripe signature verification failed: Stripe credentials not configured.")
         
     try:
         event = stripe.Webhook.construct_event(
