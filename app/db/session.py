@@ -15,6 +15,7 @@ engine = create_async_engine(
     settings.async_database_url,
     echo=False,
     future=True,
+    connect_args={"statement_cache_size": 0},
 )
 
 if _use_new_sessionmaker:

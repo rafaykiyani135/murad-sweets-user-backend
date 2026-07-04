@@ -522,7 +522,7 @@ PRODUCTS_DATA = [
 async def seed_database():
     print(settings.async_database_url)
     # Connect directly using SQLAlchemy async session
-    engine = create_async_engine(settings.async_database_url, echo=True)
+    engine = create_async_engine(settings.async_database_url, echo=True, connect_args={"statement_cache_size": 0})
     async_session = sessionmaker(
         engine, class_=AsyncSession, expire_on_commit=False
     )

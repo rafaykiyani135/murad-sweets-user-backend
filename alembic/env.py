@@ -70,6 +70,7 @@ async def run_migrations_online() -> None:
     connectable = create_async_engine(
         settings.async_database_url,
         poolclass=pool.NullPool,
+        connect_args={"statement_cache_size": 0},
     )
 
     async with connectable.connect() as connection:
