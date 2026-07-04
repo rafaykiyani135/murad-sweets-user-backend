@@ -27,8 +27,11 @@ async def stripe_webhook(request: Request, db: AsyncSession = Depends(get_db)):
     
     # If stripe is installed and event was constructed successfully
     if event:
-        event_type = event.get('type')
-        data_obj = event.get('data', {}).get('object', {})
+        # Convert to dict to safely use .get() as Stripe objects in newer SDKs do not support it directly
+        event_dict = event.to_dict() if hasattr(event, "to_dict") else dict(event)
+        
+        event_type = event_dict.get('type')
+        data_obj = event_dict.get('data', {}).get('object', {})
         
         # We stored the order_number in metadata when creating the payment intent/checkout session
         order_number = data_obj.get("metadata", {}).get("order_number")
