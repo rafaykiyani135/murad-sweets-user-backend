@@ -126,28 +126,7 @@ async def create_order(payload: OrderCreate, request: Request, db: AsyncSession 
     # 4. Generate sequential order number
     order_number = await generate_order_number(db)
     
-    # 5. Handle optional Stripe setup
-    checkout_url = None
-    if payload.paymentMethod == "card":
-        # Extract requesting origin to redirect user back to the correct environment
-        origin = request.headers.get("origin") or request.headers.get("referer")
-        frontend_url = None
-        if origin:
-            from urllib.parse import urlparse
-            parsed = urlparse(origin)
-            if parsed.scheme and parsed.netloc:
-                frontend_url = f"{parsed.scheme}://{parsed.netloc}"
-        
-        try:
-            session = create_checkout_session(quote["total_cents"], "usd", order_number, payload.email, frontend_url=frontend_url)
-            checkout_url = session.get("checkout_url")
-        except Exception as e:
-            raise HTTPException(
-                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
-                detail=f"Card payments are currently unavailable: {str(e)}"
-            )
-        
-    # 6. Save order
+    # 5. Save order (always — before any payment redirect)
     order = Order(
         order_number=order_number,
         customer_id=customer.id,
@@ -171,7 +150,7 @@ async def create_order(payload: OrderCreate, request: Request, db: AsyncSession 
     db.add(order)
     await db.flush()  # Obtain order ID
     
-    # 7. Save items snapshot
+    # 6. Save items snapshot
     for item in quote["validated_items"]:
         order_item = OrderItem(
             order_id=order.id,
@@ -185,7 +164,7 @@ async def create_order(payload: OrderCreate, request: Request, db: AsyncSession 
         )
         db.add(order_item)
     
-    # 8. Deduct inventory — runs inside the same transaction as the order
+    # 7. Deduct inventory — runs inside the same transaction as the order
     await deduct_inventory(db, quote["validated_items"])
         
     await db.commit()
@@ -198,7 +177,29 @@ async def create_order(payload: OrderCreate, request: Request, db: AsyncSession 
     )
     order_detail = order_detail_res.scalar_one()
     
-    # 8. Send notification emails
+    # 8. Now that order is committed, create Stripe Checkout Session for card payments
+    checkout_url = None
+    if payload.paymentMethod == "card":
+        # Extract requesting origin to redirect user back to the correct environment
+        origin = request.headers.get("origin") or request.headers.get("referer")
+        frontend_url = None
+        if origin:
+            from urllib.parse import urlparse
+            parsed = urlparse(origin)
+            if parsed.scheme and parsed.netloc:
+                frontend_url = f"{parsed.scheme}://{parsed.netloc}"
+        
+        try:
+            session = create_checkout_session(quote["total_cents"], "usd", order_number, payload.email, frontend_url=frontend_url)
+            checkout_url = session.get("checkout_url")
+        except Exception as e:
+            # Order is already saved — return it with an error so frontend can display a message
+            raise HTTPException(
+                status_code=status.HTTP_503_SERVICE_UNAVAILABLE,
+                detail=f"Order #{order_number} was saved but card payment setup failed: {str(e)}. Please contact support."
+            )
+
+    # 9. Send notification emails
     send_order_confirmation_emails(
         customer_email=payload.email,
         customer_name=payload.fullName,
