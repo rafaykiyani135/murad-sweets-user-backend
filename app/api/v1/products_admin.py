@@ -16,6 +16,8 @@ from sqlalchemy.orm import selectinload
 from app.db.session import get_db
 from app.models.category import Category
 from app.models.product import Product
+from app.models.admin_user import AdminUser
+from app.api.v1.auth import get_current_admin_from_cookie
 
 router = APIRouter()
 
@@ -72,7 +74,7 @@ class ProductUpdate(BaseModel):
 # ─── Category Endpoints ───────────────────────────────────────────────────────
 
 @router.get("/categories")
-async def admin_list_categories(db: AsyncSession = Depends(get_db)):
+async def admin_list_categories(db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin_from_cookie)):
     """List ALL categories including inactive ones, with their products."""
     result = await db.execute(
         select(Category)
@@ -113,7 +115,7 @@ async def admin_list_categories(db: AsyncSession = Depends(get_db)):
 
 
 @router.post("/categories", status_code=201)
-async def admin_create_category(payload: CategoryCreate, db: AsyncSession = Depends(get_db)):
+async def admin_create_category(payload: CategoryCreate, db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin_from_cookie)):
     """Create a new category."""
     slug = slugify(payload.name)
     # Ensure slug is unique
@@ -135,7 +137,7 @@ async def admin_create_category(payload: CategoryCreate, db: AsyncSession = Depe
 
 
 @router.patch("/categories/{category_id}")
-async def admin_update_category(category_id: str, payload: CategoryUpdate, db: AsyncSession = Depends(get_db)):
+async def admin_update_category(category_id: str, payload: CategoryUpdate, db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin_from_cookie)):
     """Update a category's name, description, sort order, or active status."""
     result = await db.execute(select(Category).where(Category.id == uuid.UUID(category_id)))
     cat = result.scalar_one_or_none()
@@ -156,7 +158,7 @@ async def admin_update_category(category_id: str, payload: CategoryUpdate, db: A
 
 
 @router.delete("/categories/{category_id}")
-async def admin_delete_category(category_id: str, db: AsyncSession = Depends(get_db)):
+async def admin_delete_category(category_id: str, db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin_from_cookie)):
     """Delete a category and all its products (cascade)."""
     result = await db.execute(select(Category).where(Category.id == uuid.UUID(category_id)))
     cat = result.scalar_one_or_none()
@@ -170,7 +172,7 @@ async def admin_delete_category(category_id: str, db: AsyncSession = Depends(get
 # ─── Product Endpoints ────────────────────────────────────────────────────────
 
 @router.post("/products", status_code=201)
-async def admin_create_product(payload: ProductCreate, db: AsyncSession = Depends(get_db)):
+async def admin_create_product(payload: ProductCreate, db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin_from_cookie)):
     """Create a new product inside a category."""
     try:
         cat_uuid = uuid.UUID(payload.category_id)
@@ -213,7 +215,7 @@ async def admin_create_product(payload: ProductCreate, db: AsyncSession = Depend
 
 
 @router.patch("/products/{product_id}")
-async def admin_update_product(product_id: str, payload: ProductUpdate, db: AsyncSession = Depends(get_db)):
+async def admin_update_product(product_id: str, payload: ProductUpdate, db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin_from_cookie)):
     """Update any field on a product."""
     result = await db.execute(select(Product).where(Product.id == uuid.UUID(product_id)))
     product = result.scalar_one_or_none()
@@ -252,7 +254,7 @@ async def admin_update_product(product_id: str, payload: ProductUpdate, db: Asyn
 
 
 @router.delete("/products/{product_id}")
-async def admin_delete_product(product_id: str, db: AsyncSession = Depends(get_db)):
+async def admin_delete_product(product_id: str, db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin_from_cookie)):
     """Delete a product permanently."""
     result = await db.execute(select(Product).where(Product.id == uuid.UUID(product_id)))
     product = result.scalar_one_or_none()

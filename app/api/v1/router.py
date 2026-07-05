@@ -1,9 +1,10 @@
 from fastapi import APIRouter
-from app.api.v1 import catalog, cart, orders, inquiries, admin, history, settings, products_admin, webhooks
+from app.api.v1 import catalog, cart, orders, inquiries, admin, history, settings, products_admin, webhooks, auth
 
 api_router = APIRouter()
 
 # Register sub-routers with correct prefixes and tags
+api_router.include_router(auth.router, prefix="/auth", tags=["Auth"])
 api_router.include_router(catalog.router, tags=["Catalog"])
 api_router.include_router(cart.router, prefix="/cart", tags=["Cart"])
 api_router.include_router(orders.router, prefix="/orders", tags=["Orders"])

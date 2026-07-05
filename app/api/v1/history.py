@@ -1,9 +1,8 @@
 """
-Temporary /history router — provides unauthenticated admin visibility into
+/history router — provides authenticated admin visibility into
 order history and current inventory levels.
 
-NOTE: This is intentionally unauthenticated for now. When migrated to the
-real /admin panel, JWT protection will be added.
+All endpoints require a valid admin session cookie.
 """
 
 import uuid
@@ -24,6 +23,8 @@ from app.schemas.orders import OrderSummary
 from app.schemas.inventory import StockSummary
 from app.services.inventory import deduct_inventory, restore_inventory
 from app.services.order_numbers import generate_order_number
+from app.api.v1.auth import get_current_admin_from_cookie
+from app.models.admin_user import AdminUser
 
 router = APIRouter()
 
@@ -60,7 +61,8 @@ class ManualOrderCreate(BaseModel):
 async def history_orders(
     limit: int = 200,
     offset: int = 0,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin_from_cookie),
 ):
     """
     Return a lightweight list of all orders (newest first).
@@ -95,7 +97,8 @@ async def history_orders(
 async def history_update_order_status(
     order_number: str,
     payload: HistoryStatusUpdate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin_from_cookie),
 ):
     """
     Update the status of an order.
@@ -141,7 +144,8 @@ async def history_update_order_status(
 @router.get("/orders/{order_number}")
 async def history_get_order(
     order_number: str,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin_from_cookie),
 ):
     """
     Get detailed order information by order number.
@@ -186,7 +190,8 @@ async def history_get_order(
 @router.post("/orders", response_model=OrderSummary, status_code=201)
 async def history_create_manual_order(
     payload: ManualOrderCreate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin_from_cookie),
 ):
     """
     Manually create an order from the dashboard.
@@ -310,7 +315,7 @@ async def history_create_manual_order(
 
 
 @router.get("/stock", response_model=List[StockSummary])
-async def history_stock(db: AsyncSession = Depends(get_db)):
+async def history_stock(db: AsyncSession = Depends(get_db), admin: AdminUser = Depends(get_current_admin_from_cookie)):
     """
     Return all products that have quantity tracking enabled (quantity_on_hand IS NOT NULL).
     Pitha, party trays, and custom_box containers are excluded (they have NULL).
@@ -348,7 +353,8 @@ class HistoryStockUpdate(BaseModel):
 async def history_update_stock(
     product_id: uuid.UUID,
     payload: HistoryStockUpdate,
-    db: AsyncSession = Depends(get_db)
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin_from_cookie),
 ):
     """
     Update a product's stock levels.
