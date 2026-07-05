@@ -49,7 +49,7 @@ def _set_auth_cookie(response: Response, token: str) -> None:
         value=token,
         httponly=True,
         secure=is_production,         # HTTPS only in production
-        samesite="lax",
+        samesite="none" if is_production else "lax",
         max_age=settings.ACCESS_TOKEN_EXPIRE_MINUTES * 60,
         path="/",
     )
@@ -61,7 +61,7 @@ def _clear_auth_cookie(response: Response) -> None:
         key=AUTH_COOKIE_NAME,
         httponly=True,
         secure=is_production,
-        samesite="lax",
+        samesite="none" if is_production else "lax",
         path="/",
     )
 
