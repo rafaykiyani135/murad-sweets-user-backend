@@ -171,6 +171,7 @@ async def history_get_order(
         "scheduled_date": order.scheduled_date.isoformat(),
         "scheduled_slot": order.scheduled_slot,
         "fulfillment_type": order.fulfillment_type,
+        "delivery_address": f"{order.street}, {order.city}, {order.state} {order.zip_code}" if order.fulfillment_type == "delivery" and order.street else None,
         "created_at": order.created_at.isoformat() if order.created_at else None,
         "notes": order.notes,
         "admin_notes": order.admin_notes,

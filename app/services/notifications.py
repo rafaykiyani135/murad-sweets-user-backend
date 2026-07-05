@@ -106,6 +106,7 @@ def send_order_confirmation_emails(
     scheduled_slot: str,
     items: Optional[list[dict]] = None,
     customer_phone: Optional[str] = None,
+    delivery_address: Optional[str] = None,
 ) -> None:
     """Send order confirmation emails to the customer and the store owner."""
     total_dollars = total_cents / 100.0
@@ -120,7 +121,7 @@ def send_order_confirmation_emails(
         <p>We have received your order <strong>{order_number}</strong> and are reviewing the details.</p>
         <p><strong>Order Summary:</strong></p>
         <ul>
-          <li>Fulfillment: {fulfillment_type.capitalize()}</li>
+          <li>Fulfillment: {delivery_address if fulfillment_type == 'delivery' and delivery_address else fulfillment_type.capitalize()}</li>
           <li>Scheduled Date: {scheduled_date}</li>
           <li>Scheduled Time Slot: {scheduled_slot}</li>
           <li>Total Amount: ${total_dollars:.2f}</li>
@@ -146,7 +147,7 @@ def send_order_confirmation_emails(
         </ul>
         <p><strong>Fulfillment Details:</strong></p>
         <ul>
-          <li>Type: {fulfillment_type.capitalize()}</li>
+          <li>Type: {delivery_address if fulfillment_type == 'delivery' and delivery_address else fulfillment_type.capitalize()}</li>
           <li>Scheduled: {scheduled_date} ({scheduled_slot})</li>
           <li>Total: ${total_dollars:.2f}</li>
         </ul>

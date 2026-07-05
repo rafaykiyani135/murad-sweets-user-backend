@@ -209,6 +209,7 @@ async def create_order(payload: OrderCreate, request: Request, db: AsyncSession 
         scheduled_date=payload.date,
         scheduled_slot=payload.slot,
         customer_phone=payload.phone,
+        delivery_address=f"{payload.street}, {payload.city}, {payload.state} {payload.zip}" if payload.street else None,
         items=[
             {
                 "name": item.name_snapshot,
