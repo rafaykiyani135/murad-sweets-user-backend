@@ -23,6 +23,7 @@ class Product(Base):
     quantity_on_hand: Mapped[int | None] = mapped_column(Integer, nullable=True, default=None)  # NULL = untracked, 0 = out of stock
     preorder_only: Mapped[bool] = mapped_column(Boolean, default=False)
     prep_time_hours: Mapped[int] = mapped_column(Integer, default=0)
+    sort_order: Mapped[int] = mapped_column(Integer, default=0)
     metadata_json: Mapped[dict | None] = mapped_column(JSON, name="metadata", nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc))
     updated_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(timezone.utc), onupdate=lambda: datetime.now(timezone.utc))

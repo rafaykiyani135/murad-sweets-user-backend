@@ -48,7 +48,7 @@ async def list_products(
             )
         )
         
-    result = await db.execute(query)
+    result = await db.execute(query.order_by(Product.sort_order, Product.name))
     return result.scalars().all()
 
 @router.get("/products/{slug}", response_model=ProductOut)
@@ -72,6 +72,7 @@ async def get_collection(cat_slug: str, db: AsyncSession = Depends(get_db)):
         .options(selectinload(Product.options))
         .join(Category)
         .where(Category.slug == cat_slug, Product.is_active == True)
+        .order_by(Product.sort_order, Product.name)
     )
     return result.scalars().all()
 
@@ -87,7 +88,7 @@ async def get_store_settings():
         time_slots=[
             "Morning (10:00 AM – 1:00 PM)",
             "Afternoon (1:00 PM – 5:00 PM)",
-            "Evening (5:00 PM – 8:00 PM)"
+            "Evening (5:00 PM – 10:00 PM)"
         ],
         payment_methods=["cod", "card"]
     )

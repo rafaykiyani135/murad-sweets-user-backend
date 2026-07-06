@@ -98,18 +98,18 @@ PRODUCTS_DATA = [
         "quantity_on_hand": 50,
         "images": ["/KalujamSandwich.png"]
     },
-    # {
-    #     "orig_id": "5",
-    #     "slug": "kheer-mouchak",
-    #     "name": "Kheer Mouchak",
-    #     "category_slug": "dry-sweets",
-    #     "description": "A honeycomb-shaped royal delight made with chenna, soaked in saffron syrup, and covered with creamy, reduced milk kheer.",
-    #     "price_cents": 0,
-    #     "product_type": "selection_item",
-    #     "in_stock": True,
-    #     "quantity_on_hand": 50,
-    #     "images": ["/KheerMouchak.png"]
-    # },
+    {
+        "orig_id": "5",
+        "slug": "kheer-mouchak",
+        "name": "Kheer Mouchak",
+        "category_slug": "dry-sweets",
+        "description": "A honeycomb-shaped royal delight made with chenna, soaked in saffron syrup, and covered with creamy, reduced milk kheer.",
+        "price_cents": 0,
+        "product_type": "selection_item",
+        "in_stock": True,
+        "quantity_on_hand": 50,
+        "images": ["/KheerMouchak.png"]
+    },
     {
         "orig_id": "6",
         "slug": "malaikari",
@@ -375,18 +375,18 @@ PRODUCTS_DATA = [
         "in_stock": True,
         "images": ["/Shandesh.png"]
     },
-    # {
-    #     "orig_id": "mpp-5",
-    #     "slug": "kheer-mouchak-lb",
-    #     "name": "Kheer Mouchak",
-    #     "category_slug": "mishti-per-pound",
-    #     "description": "A honeycomb-shaped royal delight made with chenna, soaked in saffron syrup, and covered with creamy kheer.",
-    #     "price_cents": 1300,
-    #     "unit_label": "per lb",
-    #     "product_type": "standard",
-    #     "in_stock": True,
-    #     "images": ["/KheerMouchak.png"]
-    # },
+    {
+        "orig_id": "mpp-5",
+        "slug": "kheer-mouchak-lb",
+        "name": "Kheer Mouchak",
+        "category_slug": "mishti-per-pound",
+        "description": "A honeycomb-shaped royal delight made with chenna, soaked in saffron syrup, and covered with creamy kheer.",
+        "price_cents": 1200,
+        "unit_label": "per lb",
+        "product_type": "standard",
+        "in_stock": True,
+        "images": ["/KheerMouchak.png"]
+    },
     {
         "orig_id": "mpp-6",
         "slug": "kala-jamun-sandwich-lb",
@@ -586,6 +586,14 @@ async def seed_database():
                 )
                 session.add(product)
             else:
+                product.is_active = True
+                product.is_in_stock = prod_data["in_stock"]
+                product.base_price_cents = prod_data["price_cents"]
+                product.category_id = cat_id
+                product.name = prod_data["name"]
+                product.description = prod_data["description"]
+                product.product_type = prod_data["product_type"]
+                product.unit_label = prod_data.get("unit_label")
                 # Update quantity_on_hand on re-seed only if explicitly set in data
                 if "quantity_on_hand" in prod_data and product.quantity_on_hand is None:
                     product.quantity_on_hand = prod_data["quantity_on_hand"]

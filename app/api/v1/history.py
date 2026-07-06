@@ -177,6 +177,7 @@ async def history_get_order(
         "admin_notes": order.admin_notes,
         "items": [
             {
+                "id": str(item.id),
                 "name": item.name_snapshot,
                 "unit_price": item.unit_price_cents / 100.0,
                 "quantity": item.quantity,
@@ -377,3 +378,62 @@ async def history_update_stock(
         "quantity_on_hand": product.quantity_on_hand,
         "is_in_stock": product.is_in_stock
     }
+
+class HistoryItemSelectionsUpdate(BaseModel):
+    selections: dict
+
+@router.patch("/orders/{order_number}/items/{item_id}/selections")
+async def history_update_item_selections(
+    order_number: str,
+    item_id: uuid.UUID,
+    payload: HistoryItemSelectionsUpdate,
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin_from_cookie),
+):
+    """
+    Update the Mix & Match selections for a specific order item.
+    Adjusts inventory by restoring old selections and deducting new ones.
+    """
+    result = await db.execute(
+        select(Order)
+        .options(selectinload(Order.items))
+        .where(Order.order_number == order_number)
+    )
+    order = result.scalar_one_or_none()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    target_item = None
+    for item in order.items:
+        if item.id == item_id:
+            target_item = item
+            break
+            
+    if not target_item:
+        raise HTTPException(status_code=404, detail="Order item not found")
+
+    # If the order is NOT cancelled, we need to adjust inventory
+    if order.status != "cancelled":
+        # 1. Restore old selections
+        if target_item.selections and "selectedItems" in target_item.selections:
+            for old_sel in target_item.selections["selectedItems"]:
+                prod_res = await db.execute(select(Product).where(Product.name == old_sel["name"]))
+                prod = prod_res.scalars().first()
+                if prod and prod.quantity_on_hand is not None:
+                    # Restore old_sel["quantity"] * target_item.quantity
+                    prod.quantity_on_hand += old_sel["quantity"] * target_item.quantity
+
+        # 2. Deduct new selections
+        if payload.selections and "selectedItems" in payload.selections:
+            for new_sel in payload.selections["selectedItems"]:
+                prod_res = await db.execute(select(Product).where(Product.name == new_sel["name"]))
+                prod = prod_res.scalars().first()
+                if prod and prod.quantity_on_hand is not None:
+                    # Deduct new_sel["quantity"] * target_item.quantity
+                    prod.quantity_on_hand -= new_sel["quantity"] * target_item.quantity
+
+    # 3. Update selections
+    target_item.selections = payload.selections
+    
+    await db.commit()
+    return {"status": "success"}

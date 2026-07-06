@@ -106,8 +106,9 @@ async def admin_list_categories(db: AsyncSession = Depends(get_db), admin: Admin
                     "is_in_stock": p.is_in_stock,
                     "quantity_on_hand": p.quantity_on_hand,
                     "category_id": str(p.category_id),
+                    "sort_order": p.sort_order,
                 }
-                for p in sorted(c.products, key=lambda x: x.name)
+                for p in sorted(c.products, key=lambda x: (x.sort_order, x.name))
             ]
         }
         for c in cats
@@ -263,3 +264,41 @@ async def admin_delete_product(product_id: str, db: AsyncSession = Depends(get_d
     await db.delete(product)
     await db.commit()
     return {"deleted": True}
+
+
+# ─── Reorder Endpoints ────────────────────────────────────────────────────────
+
+class ReorderPayload(BaseModel):
+    ordered_ids: List[str]  # list of UUIDs in desired order (index = sort_order)
+
+
+@router.post("/categories/reorder")
+async def admin_reorder_categories(
+    payload: ReorderPayload,
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin_from_cookie),
+):
+    """Bulk-update sort_order for categories. ordered_ids should be all category IDs in the new desired order."""
+    for idx, cat_id in enumerate(payload.ordered_ids):
+        result = await db.execute(select(Category).where(Category.id == uuid.UUID(cat_id)))
+        cat = result.scalar_one_or_none()
+        if cat:
+            cat.sort_order = idx
+    await db.commit()
+    return {"updated": len(payload.ordered_ids)}
+
+
+@router.post("/products/reorder")
+async def admin_reorder_products(
+    payload: ReorderPayload,
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin_from_cookie),
+):
+    """Bulk-update sort_order for products within a category. ordered_ids should be all product IDs in the new desired order."""
+    for idx, prod_id in enumerate(payload.ordered_ids):
+        result = await db.execute(select(Product).where(Product.id == uuid.UUID(prod_id)))
+        prod = result.scalar_one_or_none()
+        if prod:
+            prod.sort_order = idx
+    await db.commit()
+    return {"updated": len(payload.ordered_ids)}
