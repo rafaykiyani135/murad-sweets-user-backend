@@ -93,6 +93,8 @@ class OrderNotesUpdate(BaseModel):
 class OrderSummary(BaseModel):
     order_number: str
     status: str
+    payment_status: str = "pending"
+    payment_method: str = "cod"
     customer_name: str
     total: float
     scheduled_date: str

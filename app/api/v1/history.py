@@ -34,6 +34,9 @@ router = APIRouter()
 class HistoryStatusUpdate(BaseModel):
     status: str  # "pending" | "completed" | "cancelled"
 
+class HistoryPaymentStatusUpdate(BaseModel):
+    payment_status: str  # "pending" | "paid" | "failed" | "refunded"
+
 
 from typing import Optional
 
@@ -82,6 +85,8 @@ async def history_orders(
         summaries.append(OrderSummary(
             order_number=order.order_number,
             status=order.status,
+            payment_status=order.payment_status,
+            payment_method=order.payment_method,
             customer_name=order.customer.full_name if order.customer else "Unknown",
             total=order.total_cents / 100.0,
             scheduled_date=order.scheduled_date.isoformat(),
@@ -132,6 +137,51 @@ async def history_update_order_status(
     return OrderSummary(
         order_number=order.order_number,
         status=order.status,
+        payment_status=order.payment_status,
+        payment_method=order.payment_method,
+        customer_name=order.customer.full_name if order.customer else "Unknown",
+        total=order.total_cents / 100.0,
+        scheduled_date=order.scheduled_date.isoformat(),
+        item_count=sum(item.quantity for item in order.items),
+        fulfillment_type=order.fulfillment_type,
+        created_at=order.created_at,
+    )
+
+
+@router.patch("/orders/{order_number}/payment-status", response_model=OrderSummary)
+async def history_update_payment_status(
+    order_number: str,
+    payload: HistoryPaymentStatusUpdate,
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin_from_cookie),
+):
+    """
+    Update the payment status of an order.
+    """
+    allowed = {"pending", "paid", "failed", "refunded"}
+    if payload.payment_status not in allowed:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Payment status must be one of: {', '.join(sorted(allowed))}"
+        )
+
+    result = await db.execute(
+        select(Order)
+        .options(selectinload(Order.customer), selectinload(Order.items))
+        .where(Order.order_number == order_number)
+    )
+    order = result.scalar_one_or_none()
+    if not order:
+        raise HTTPException(status_code=404, detail="Order not found")
+
+    order.payment_status = payload.payment_status
+    await db.commit()
+
+    return OrderSummary(
+        order_number=order.order_number,
+        status=order.status,
+        payment_status=order.payment_status,
+        payment_method=order.payment_method,
         customer_name=order.customer.full_name if order.customer else "Unknown",
         total=order.total_cents / 100.0,
         scheduled_date=order.scheduled_date.isoformat(),
@@ -162,6 +212,8 @@ async def history_get_order(
     return {
         "order_number": order.order_number,
         "status": order.status,
+        "payment_status": order.payment_status,
+        "payment_method": order.payment_method,
         "customer": {
             "full_name": order.customer.full_name if order.customer else "Unknown",
             "email": order.customer.email if order.customer else "",
@@ -307,6 +359,8 @@ async def history_create_manual_order(
     return OrderSummary(
         order_number=order.order_number,
         status=order.status,
+        payment_status=order.payment_status,
+        payment_method=order.payment_method,
         customer_name=order.customer.full_name,
         total=order.total_cents / 100.0,
         scheduled_date=order.scheduled_date.isoformat(),
