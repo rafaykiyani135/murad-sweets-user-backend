@@ -38,6 +38,7 @@ async def calculate_quote(
     subtotal_cents = 0
     validated_items = []
     max_prep_time_hours = 0
+    demanded_quantities = {}  # Track total quantities requested per product ID across the entire order
 
     # 1. Validate Fulfillment (Removed outdated ZIP code check)
     if fulfillment_type == "delivery":
@@ -67,12 +68,15 @@ async def calculate_quote(
         if not product.is_in_stock:
             raise HTTPException(status_code=400, detail=f"Product {product.name} is currently out of stock.")
 
-        # Hard-block if tracked quantity is insufficient
-        if product.quantity_on_hand is not None and product.quantity_on_hand < quantity:
-            raise HTTPException(
-                status_code=400,
-                detail=f"Only {product.quantity_on_hand} unit(s) of '{product.name}' left in stock."
-            )
+        # Track and validate standard product stock (if not custom_box container)
+        if product.product_type != "custom_box":
+            total_demanded = demanded_quantities.get(product.id, 0) + quantity
+            demanded_quantities[product.id] = total_demanded
+            if product.quantity_on_hand is not None and product.quantity_on_hand < total_demanded:
+                raise HTTPException(
+                    status_code=400,
+                    detail=f"Only {product.quantity_on_hand} unit(s) of '{product.name}' left in stock (you requested {total_demanded})."
+                )
 
         # Check prep time
         if product.preorder_only and product.prep_time_hours > max_prep_time_hours:
@@ -161,11 +165,13 @@ async def calculate_quote(
                             status_code=400,
                             detail=f"Invalid sweet selection: {selected.get('name', sweet_id)}. Only active, in-stock dry sweets are allowed."
                         )
-                    # Hard-block if tracked quantity is insufficient for this sweet
-                    if sweet.quantity_on_hand is not None and sweet.quantity_on_hand < sweet_qty:
+                    # Hard-block if aggregated quantity is insufficient for this sweet
+                    total_sweet_qty = demanded_quantities.get(sweet.id, 0) + (sweet_qty * quantity)
+                    demanded_quantities[sweet.id] = total_sweet_qty
+                    if sweet.quantity_on_hand is not None and sweet.quantity_on_hand < total_sweet_qty:
                         raise HTTPException(
                             status_code=400,
-                            detail=f"Only {sweet.quantity_on_hand} unit(s) of '{sweet.name}' left in stock."
+                            detail=f"Only {sweet.quantity_on_hand} unit(s) of '{sweet.name}' left in stock (you requested {total_sweet_qty})."
                         )
             
             elif assorted_box:
@@ -195,6 +201,15 @@ async def calculate_quote(
                             detail=f"Invalid assorted sweet: {sweet_name}. Must be an active in-stock dry sweet."
                         )
                     
+                    # Hard-block if aggregated quantity is insufficient for this sweet
+                    total_sweet_qty = demanded_quantities.get(sweet.id, 0) + (1 * quantity)
+                    demanded_quantities[sweet.id] = total_sweet_qty
+                    if sweet.quantity_on_hand is not None and sweet.quantity_on_hand < total_sweet_qty:
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"Only {sweet.quantity_on_hand} unit(s) of '{sweet.name}' left in stock (you requested {total_sweet_qty})."
+                        )
+
                     enriched_selected_items.append({
                         "id": str(sweet.id),
                         "name": sweet.name,
