@@ -57,6 +57,7 @@ class ProductCreate(BaseModel):
     is_active: bool = True
     is_in_stock: bool = True
     quantity_on_hand: Optional[int] = None
+    metadata: Optional[dict] = None  # e.g. {"images": ["/GulabJamun.webp"]}
 
 class ProductUpdate(BaseModel):
     name: Optional[str] = None
@@ -69,6 +70,7 @@ class ProductUpdate(BaseModel):
     min_quantity: Optional[int] = None
     max_quantity: Optional[int] = None
     category_id: Optional[str] = None
+    metadata: Optional[dict] = None  # e.g. {"images": ["/GulabJamun.webp"]}
 
 
 # ─── Category Endpoints ───────────────────────────────────────────────────────
@@ -107,6 +109,7 @@ async def admin_list_categories(db: AsyncSession = Depends(get_db), admin: Admin
                     "quantity_on_hand": p.quantity_on_hand,
                     "category_id": str(p.category_id),
                     "sort_order": p.sort_order,
+                    "metadata": p.metadata_json,
                 }
                 for p in sorted(c.products, key=lambda x: (x.sort_order, x.name))
             ]
@@ -202,6 +205,7 @@ async def admin_create_product(payload: ProductCreate, db: AsyncSession = Depend
         is_active=payload.is_active,
         is_in_stock=payload.is_in_stock,
         quantity_on_hand=payload.quantity_on_hand,
+        metadata_json=payload.metadata,
     )
     db.add(product)
     await db.commit()
@@ -243,6 +247,8 @@ async def admin_update_product(product_id: str, payload: ProductUpdate, db: Asyn
         product.max_quantity = payload.max_quantity
     if payload.category_id is not None:
         product.category_id = uuid.UUID(payload.category_id)
+    if payload.metadata is not None:
+        product.metadata_json = payload.metadata
 
     await db.commit()
     await db.refresh(product)
@@ -302,3 +308,37 @@ async def admin_reorder_products(
             prod.sort_order = idx
     await db.commit()
     return {"updated": len(payload.ordered_ids)}
+
+
+# ─── One-Time Migration: Fix .png → .webp in all metadata_json ──────────────
+
+@router.post("/migrate/fix-image-extensions")
+async def fix_image_extensions(
+    db: AsyncSession = Depends(get_db),
+    admin: AdminUser = Depends(get_current_admin_from_cookie),
+):
+    """
+    One-time migration: replaces any .png paths inside metadata_json['images']
+    with .webp equivalents across ALL products.
+    Safe to run multiple times — only changes rows that actually have .png.
+    """
+    from sqlalchemy.orm.attributes import flag_modified
+
+    result = await db.execute(select(Product))
+    products = result.scalars().all()
+
+    fixed = 0
+    for p in products:
+        if not p.metadata_json:
+            continue
+        images = p.metadata_json.get("images", [])
+        if not isinstance(images, list):
+            continue
+        new_images = [img.replace(".png", ".webp") if isinstance(img, str) else img for img in images]
+        if new_images != images:
+            p.metadata_json = {**p.metadata_json, "images": new_images}
+            flag_modified(p, "metadata_json")
+            fixed += 1
+
+    await db.commit()
+    return {"fixed_count": fixed, "message": f"Updated {fixed} product(s): .png → .webp in metadata_json"}

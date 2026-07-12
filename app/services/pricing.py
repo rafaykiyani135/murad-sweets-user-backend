@@ -96,7 +96,10 @@ async def calculate_quote(
 
         # 3. Check Mix & Match Custom Box Constraints
         if product.product_type == "custom_box":
-            # Extract box size (3, 6, 9) from the slug (e.g. mixmatch-3 or assorted-3)
+            # Party trays are flexible — no strict count enforced
+            is_party_tray = "party-tray" in product.slug
+
+            # Extract box size (3, 6, 9) only for standard mix & match boxes
             box_size = 3
             if "3" in product.slug:
                 box_size = 3
@@ -104,10 +107,6 @@ async def calculate_quote(
                 box_size = 6
             elif "9" in product.slug:
                 box_size = 9
-            elif "small-party-tray" in product.slug:
-                box_size = 18
-            elif "large-party-tray" in product.slug:
-                box_size = 40
 
             mix_match = item.get("mixMatch")
             assorted_box = item.get("assortedBox")
@@ -131,13 +130,15 @@ async def calculate_quote(
             if mix_match:
                 # selectedItems is a list of {id, name, quantity}
                 total_selected = sum(int(s.get("quantity", 0)) for s in selected_items)
-                if total_selected != box_size:
+
+                # Party trays are flexible assortments — skip exact count enforcement
+                if not is_party_tray and total_selected != box_size:
                     raise HTTPException(
                         status_code=400,
                         detail=f"Selected items count ({total_selected}) must match box size ({box_size})."
                     )
 
-                # Validate each selected sweet is active, in-stock, and in the "dry-sweets" category
+                # Validate each selected item is active and in stock
                 for selected in selected_items:
                     sweet_id = str(selected.get("id"))
                     sweet_qty = int(selected.get("quantity", 0))
@@ -149,7 +150,13 @@ async def calculate_quote(
                         select(Product).join(Category).where(Product.id == sweet_db_id)
                     )
                     sweet = sweet_res.scalar_one_or_none()
-                    if not sweet or sweet.category.slug != "dry-sweets" or not sweet.is_active or not sweet.is_in_stock:
+                    if not sweet or not sweet.is_active or not sweet.is_in_stock:
+                        raise HTTPException(
+                            status_code=400,
+                            detail=f"Invalid selection: {selected.get('name', sweet_id)} is not available."
+                        )
+                    # For standard mix & match boxes only — enforce dry-sweets category
+                    if not is_party_tray and sweet.category.slug != "dry-sweets":
                         raise HTTPException(
                             status_code=400,
                             detail=f"Invalid sweet selection: {selected.get('name', sweet_id)}. Only active, in-stock dry sweets are allowed."
