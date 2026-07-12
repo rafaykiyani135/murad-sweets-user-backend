@@ -6,7 +6,7 @@ All endpoints require a valid admin session cookie.
 """
 
 import uuid
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import List
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel, EmailStr
@@ -62,6 +62,8 @@ class ManualOrderCreate(BaseModel):
 
 @router.get("/orders", response_model=List[OrderSummary])
 async def history_orders(
+    start_date: str | None = None,
+    end_date: str | None = None,
     limit: int = 200,
     offset: int = 0,
     db: AsyncSession = Depends(get_db),
@@ -71,13 +73,26 @@ async def history_orders(
     Return a lightweight list of all orders (newest first).
     Used by the /history dashboard to display order history.
     """
-    result = await db.execute(
-        select(Order)
-        .options(selectinload(Order.customer), selectinload(Order.items))
-        .order_by(Order.created_at.desc())
-        .limit(limit)
-        .offset(offset)
-    )
+    query = select(Order).options(selectinload(Order.customer), selectinload(Order.items))
+
+    if start_date:
+        try:
+            start_dt = datetime.strptime(start_date, "%Y-%m-%d").replace(tzinfo=timezone.utc)
+            query = query.where(Order.created_at >= start_dt)
+        except ValueError:
+            pass
+
+    if end_date:
+        try:
+            end_dt = datetime.strptime(end_date, "%Y-%m-%d").replace(
+                hour=23, minute=59, second=59, microsecond=999999, tzinfo=timezone.utc
+            )
+            query = query.where(Order.created_at <= end_dt)
+        except ValueError:
+            pass
+
+    query = query.order_by(Order.created_at.desc()).limit(limit).offset(offset)
+    result = await db.execute(query)
     orders = result.scalars().all()
 
     summaries = []
