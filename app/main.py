@@ -48,5 +48,10 @@ async def root():
         "documentation": "/docs"
     }
 
+@app.get("/health")
+async def health():
+    return {"status": "healthy"}
+
+
 # Register all API endpoints
 app.include_router(api_router, prefix="/api/v1")
