@@ -5,7 +5,7 @@ This document summarizes the recent Search Engine Optimization (SEO) improvement
 
 ## 1. Global Metadata Configuration (`app/layout.tsx`)
 The site's root layout has been enriched with comprehensive metadata to improve search visibility and social sharing:
-- **Title & Description:** Optimized to include primary keywords like "Authentic Bangladeshi Mishti" and "Bengali Mithai in USA", improving click-through rates.
+- **Title & Description:** Optimized to include primary keywords like "Authentic Bangladeshi Mishti" and "Bengali Sweets in USA", improving click-through rates.
 - **Keywords:** A highly targeted list of 16 industry-specific terms (e.g., "Mishti Doi", "Rasmalai Cake", "Premium Indian Sweets", "Desi Sweets Houston", "Halal Sweets USA", "Traditional Pitha") has been added to capture relevant search traffic.
 - **OpenGraph & Twitter Cards:** Configured `openGraph` and `twitter` tags to ensure rich previews (title, description, and images) when links are shared on platforms like Facebook, Twitter, and messaging apps.
 - **Robots Meta Tag:** Explicitly set to `index: true, follow: true` with GoogleBot-specific rules to allow rich snippets and large image previews.
