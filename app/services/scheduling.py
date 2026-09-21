@@ -1,4 +1,4 @@
-from datetime import datetime, date, time, timedelta, timezone
+from datetime import datetime, date, time, timedelta
 from typing import List, Tuple
 from fastapi import HTTPException
 
@@ -9,22 +9,30 @@ SLOT_TIMES = {
     "Evening": time(17, 0)
 }
 
+# Preferred dates start tomorrow and stay inside a 90-day window from today.
+MAX_SCHEDULE_DAYS = 90
+
 def validate_schedule(scheduled_date: date, slot: str, max_prep_time_hours: int) -> bool:
     """
     Validates if the scheduled date and slot respect:
-    1. Date is in the future (minimum tomorrow).
-    2. Lead prep time is respected.
+    1. Date is tomorrow or later (today and every earlier date are rejected).
+    2. Date is within 90 days of today.
+    3. Lead prep time is respected.
     """
-    now = datetime.now(timezone.utc)
-    
-    # 1. Date check: must be >= tomorrow (local date)
-    # Note: For simplicity and server time alignment, we compare date objects.
-    # The client must select tomorrow or later.
-    tomorrow = (datetime.now() + timedelta(days=1)).date()
+    today = datetime.now().date()
+    tomorrow = today + timedelta(days=1)
+    latest = today + timedelta(days=MAX_SCHEDULE_DAYS)
+
     if scheduled_date < tomorrow:
         raise HTTPException(
             status_code=400,
             detail="Fulfillment date must be scheduled at least 1 day in advance (tomorrow or later)."
+        )
+
+    if scheduled_date > latest:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Fulfillment date must be within {MAX_SCHEDULE_DAYS} days from today."
         )
 
     # 2. Preorder lead-time check
